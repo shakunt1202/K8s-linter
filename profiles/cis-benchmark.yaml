@@ -1,0 +1,88 @@
+name: "CIS Kubernetes Benchmark v1.8"
+version: "1.8.0"
+description: >
+  CIS Kubernetes Benchmark profile covering workload security controls.
+  Based on CIS Kubernetes Benchmark v1.8 recommendations for pod security,
+  RBAC, network policies, and resource management.
+
+rules:
+
+  # ── 5.2 Pod Security Standards ────────────────────────────────────────────
+
+  - id: cis-5.2.1
+    name: Minimize admission of privileged containers
+    description: CIS 5.2.1 - Do not generally permit containers to be run with the securityContext.privileged flag set to true.
+    severity: critical
+    category: pod-security
+    enabled: true
+    remediation: >
+      Remove privileged: true from all container securityContext blocks.
+      Apply Pod Security Standards: kubectl label namespace <ns> pod-security.kubernetes.io/enforce=baseline
+    selectors:
+      path: "spec.template.spec.containers[*].securityContext.privileged"
+      bad_value: true
+
+  - id: cis-5.2.2
+    name: Minimize admission of containers with hostPID
+    description: CIS 5.2.2 - Do not admit containers wishing to share the host process ID namespace.
+    severity: critical
+    category: pod-security
+    enabled: true
+    remediation: >
+      Set hostPID: false or remove the field entirely from pod specs.
+      Only system-level monitoring pods should require this capability.
+    selectors:
+      path: "spec.template.spec.hostPID"
+      bad_value: true
+
+  - id: cis-5.2.3
+    name: Minimize admission of containers with hostIPC
+    description: CIS 5.2.3 - Do not admit containers wishing to share the host IPC namespace.
+    severity: critical
+    category: pod-security
+    enabled: true
+    remediation: >
+      Set hostIPC: false or remove the field from pod specs.
+      Sharing host IPC allows container processes to communicate with host processes.
+    selectors:
+      path: "spec.template.spec.hostIPC"
+      bad_value: true
+
+  - id: cis-5.2.4
+    name: Minimize admission of containers with hostNetwork
+    description: CIS 5.2.4 - Do not admit containers wishing to share the host network namespace.
+    severity: critical
+    category: pod-security
+    enabled: true
+    remediation: >
+      Set hostNetwork: false or remove the field from pod specs.
+      Use Services and Ingress for network exposure instead of host networking.
+    selectors:
+      path: "spec.template.spec.hostNetwork"
+      bad_value: true
+
+  - id: cis-5.2.5
+    name: Minimize admission of containers with allowPrivilegeEscalation
+    description: CIS 5.2.5 - Do not generally permit containers to be run with the allowPrivilegeEscalation flag set to true.
+    severity: high
+    category: pod-security
+    enabled: true
+    remediation: >
+      Set securityContext.allowPrivilegeEscalation: false on all containers.
+      This prevents a process from gaining more privileges than its parent.
+    selectors:
+      path: "spec.template.spec.containers[*].securityContext.allowPrivilegeEscalation"
+      required_value: false
+
+  - id: cis-5.2.6
+    name: Minimize admission of root containers
+    description: CIS 5.2.6 - Do not admit containers wishing to run as root.
+    severity: critical
+    category: pod-security
+    enabled: true
+    remediation: >
+      Set securityContext.runAsNonRoot: true at pod or container level.
+      Also specify runAsUser with a non-zero UID (e.g., 1000).
+    selectors:
+      path: "spec.template.spec.securityContext.runAsNonRoot"
+      required_value: true

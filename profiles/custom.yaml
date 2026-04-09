@@ -1,0 +1,318 @@
+name: "K8s Custom Hardening Profile"
+version: "1.1"
+description: >
+  Custom profile covering security, reliability, networking, RBAC, and
+  resource management. Every rule carries a `kinds` filter so checks only
+  fire against resource types they actually apply to — preventing false
+  positives like checking NodePort on a Deployment.
+
+rules:
+
+  # ── SECURITY ──────────────────────────────────────────────────────────────
+
+  - id: sec-01
+    name: No privileged containers
+    description: Containers must not run with privileged:true — bypasses all namespace isolation.
+    severity: critical
+    category: security
+    enabled: true
+    remediation: >
+      Set securityContext.privileged: false (or remove the field) on all containers.
+      Enforce via PodSecurity admission:
+      kubectl label namespace <ns> pod-security.kubernetes.io/enforce=restricted
+    selectors:
+      path: "spec.template.spec.containers[*].securityContext.privileged"
+      bad_value: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+    env_overrides:
+      development:
+        severity: medium
+
+  - id: sec-02
+    name: Read-only root filesystem
+    description: Root filesystem should be mounted read-only to prevent runtime tampering.
+    severity: critical
+    category: security
+    enabled: true
+    remediation: >
+      Set securityContext.readOnlyRootFilesystem: true on all containers.
+      Mount writable paths explicitly using emptyDir volumes.
+    selectors:
+      path: "spec.template.spec.containers[*].securityContext.readOnlyRootFilesystem"
+      required_value: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  - id: sec-03
+    name: No runAsRoot
+    description: Containers must not run as UID 0. Enables privilege escalation on escape.
+    severity: critical
+    category: security
+    enabled: true
+    remediation: >
+      Set securityContext.runAsNonRoot: true and runAsUser to a non-zero UID (e.g. 1000).
+      Also set allowPrivilegeEscalation: false.
+    selectors:
+      path: "spec.template.spec.securityContext.runAsNonRoot"
+      required_value: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  - id: sec-04
+    name: Seccomp profile enforced
+    description: All pods should have a seccomp profile applied to restrict syscalls.
+    severity: high
+    category: security
+    enabled: true
+    remediation: >
+      Add seccompProfile.type: RuntimeDefault (or Localhost) to pod securityContext.
+      Verify: kubectl get pod <n> -o jsonpath='{.spec.securityContext.seccompProfile}'
+    selectors:
+      path: "spec.template.spec.securityContext.seccompProfile"
+      required_present: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  - id: sec-05
+    name: Image tag is not latest
+    description: Container images must use explicit versioned tags — not :latest.
+    severity: high
+    category: security
+    enabled: true
+    remediation: >
+      Pin images to a specific digest or semantic version.
+      Example: nginx:1.25.3 or nginx@sha256:abc123...
+      Use imagePullPolicy: IfNotPresent with pinned tags.
+    selectors:
+      path: "spec.template.spec.containers[*].image"
+      bad_suffix: ":latest"
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  - id: sec-06
+    name: Capabilities dropped
+    description: ALL capabilities should be dropped; only required ones re-added.
+    severity: high
+    category: security
+    enabled: true
+    remediation: >
+      Set capabilities.drop: ["ALL"] and add back only what is required
+      (e.g. NET_BIND_SERVICE). Avoid SYS_ADMIN, NET_ADMIN in production.
+    selectors:
+      path: "spec.template.spec.containers[*].securityContext.capabilities.drop"
+      required_contains: "ALL"
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  - id: sec-07
+    name: No host namespace sharing
+    description: hostPID, hostIPC, and hostNetwork must all be false.
+    severity: high
+    category: security
+    enabled: true
+    remediation: >
+      Ensure hostPID: false, hostIPC: false, hostNetwork: false in all pod specs.
+      Only DaemonSets for node-level monitoring may require exceptions — document them.
+    selectors:
+      paths:
+        - "spec.template.spec.hostPID"
+        - "spec.template.spec.hostIPC"
+        - "spec.template.spec.hostNetwork"
+      bad_value: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  - id: sec-08
+    name: No automount of service account token
+    description: SA tokens should not be auto-mounted unless explicitly required.
+    severity: medium
+    category: security
+    enabled: true
+    remediation: >
+      Set automountServiceAccountToken: false on the ServiceAccount or Pod spec.
+      Only workloads that call the Kubernetes API need this token.
+    selectors:
+      path: "spec.template.spec.automountServiceAccountToken"
+      required_value: false
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  # ── RELIABILITY ────────────────────────────────────────────────────────────
+
+  - id: rel-01
+    name: Liveness probe defined
+    description: All deployments require a liveness probe for restart on deadlock.
+    severity: critical
+    category: reliability
+    enabled: true
+    remediation: >
+      Configure livenessProbe on every container. Prefer httpGet or tcpSocket over exec.
+      Do not probe external dependencies in liveness — only internal health state.
+    selectors:
+      path: "spec.template.spec.containers[*].livenessProbe"
+      required_present: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet"]
+
+  - id: rel-02
+    name: Readiness probe defined
+    description: All deployments require a readiness probe to prevent premature traffic.
+    severity: critical
+    category: reliability
+    enabled: true
+    remediation: >
+      Define readinessProbe separately from liveness — call a /health/ready endpoint.
+      Ensure initialDelaySeconds accounts for startup time.
+    selectors:
+      path: "spec.template.spec.containers[*].readinessProbe"
+      required_present: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet"]
+
+  - id: rel-03
+    name: Minimum replica count
+    description: Deployments must have at least 2 replicas to avoid single points of failure.
+    severity: high
+    category: reliability
+    enabled: true
+    remediation: >
+      Set replicas: 2 minimum (3 recommended for production).
+      Pair with a PodDisruptionBudget specifying minAvailable: 1.
+    selectors:
+      path: "spec.replicas"
+      min_value: 3
+      kinds: ["Deployment", "StatefulSet"]
+    env_overrides:
+      development:
+        skip: true
+      staging:
+        severity: medium
+
+  - id: rel-04
+    name: Rolling update strategy
+    description: Deployments must use RollingUpdate strategy to avoid downtime.
+    severity: high
+    category: reliability
+    enabled: true
+    remediation: >
+      Set strategy.type: RollingUpdate with maxSurge: 1 and maxUnavailable: 0
+      for zero-downtime deployments. Avoid Recreate in production.
+    selectors:
+      path: "spec.strategy.type"
+      required_value: "RollingUpdate"
+      kinds: ["Deployment"]
+
+  # ── NETWORKING ─────────────────────────────────────────────────────────────
+
+  - id: net-01
+    name: Network policies defined
+    description: Namespaces must have NetworkPolicies for ingress and egress control.
+    severity: critical
+    category: networking
+    enabled: true
+    remediation: >
+      Create a default-deny-all NetworkPolicy, then allow only required traffic.
+      Requires a CNI that supports NetworkPolicy (Calico, Cilium, Weave).
+      kubectl apply -f default-deny-all.yaml -n <namespace>
+    selectors:
+      kind: "NetworkPolicy"
+      required_present: true
+      kinds: ["NetworkPolicy"]
+
+  - id: net-02
+    name: No NodePort services
+    description: Production services must not use NodePort — use ClusterIP or LoadBalancer.
+    severity: high
+    category: networking
+    enabled: true
+    remediation: >
+      Change service type from NodePort to ClusterIP for internal services,
+      or LoadBalancer/Ingress for external traffic.
+      Audit: kubectl get svc --field-selector=spec.type=NodePort
+    selectors:
+      path: "spec.type"
+      bad_value: "NodePort"
+      kinds: ["Service"]
+    env_overrides:
+      development:
+        severity: low
+
+  - id: net-03
+    name: Ingress TLS configured
+    description: All Ingress resources must terminate TLS — no plaintext HTTP in production.
+    severity: high
+    category: networking
+    enabled: true
+    remediation: >
+      Configure tls blocks on Ingress with cert-manager issuing certificates.
+      Add annotation: nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    selectors:
+      path: "spec.tls"
+      required_present: true
+      kinds: ["Ingress"]
+
+  # ── RBAC ───────────────────────────────────────────────────────────────────
+
+  - id: rbac-01
+    name: Default service account not used
+    description: Pods must specify a dedicated service account — not the default.
+    severity: high
+    category: rbac
+    enabled: true
+    remediation: >
+      Create a dedicated ServiceAccount per workload.
+      Set spec.serviceAccountName in the pod spec.
+      The default SA accumulates permissions over time.
+    selectors:
+      path: "spec.template.spec.serviceAccountName"
+      bad_value: "default"
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  # ── RESOURCES ──────────────────────────────────────────────────────────────
+
+  - id: res-01
+    name: CPU limits set
+    description: All containers must specify CPU limits to prevent resource starvation.
+    severity: critical
+    category: resources
+    enabled: true
+    remediation: >
+      Set resources.limits.cpu on all containers.
+      Use VPA (Vertical Pod Autoscaler) recommendations to right-size over time.
+    selectors:
+      path: "spec.template.spec.containers[*].resources.limits.cpu"
+      required_present: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  - id: res-02
+    name: Memory limits set
+    description: All containers must specify memory limits to prevent OOM on the node.
+    severity: critical
+    category: resources
+    enabled: true
+    remediation: >
+      Set resources.limits.memory. For JVM workloads also set -XX:MaxRAMPercentage
+      to match the container limit. Limit should be ~20% above request.
+    selectors:
+      path: "spec.template.spec.containers[*].resources.limits.memory"
+      required_present: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  - id: res-03
+    name: CPU requests set
+    description: All containers must set CPU requests for scheduler bin-packing.
+    severity: high
+    category: resources
+    enabled: true
+    remediation: >
+      Set resources.requests.cpu. Requests drive scheduler placement decisions.
+      Ensure requests <= limits.
+    selectors:
+      path: "spec.template.spec.containers[*].resources.requests.cpu"
+      required_present: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+
+  - id: res-04
+    name: Memory requests set
+    description: Memory requests ensure pods are not first evicted under memory pressure.
+    severity: high
+    category: resources
+    enabled: true
+    remediation: >
+      Set resources.requests.memory. Set conservative requests with headroom of ~20%.
+      Pods without requests are first evicted under memory pressure.
+    selectors:
+      path: "spec.template.spec.containers[*].resources.requests.memory"
+      required_present: true
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]

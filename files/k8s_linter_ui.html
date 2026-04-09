@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K8s Environment Linter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0b0c0f;
+  --bg2:       #111318;
+  --bg3:       #181b22;
+  --bg4:       #1e2229;
+  --cyan:      #00e5cc;
+  --cyan-dim:  #00b39f;
+  --cyan-pale: rgba(0,229,204,0.08);
+  --cyan-glow: rgba(0,229,204,0.15);
+  --red:       #ff4d6a;
+  --red-pale:  rgba(255,77,106,0.1);
+  --amber:     #ffb830;
+  --amber-pale:rgba(255,184,48,0.1);
+  --green:     #00e07a;
+  --green-pale:rgba(0,224,122,0.1);
+  --blue:      #4d9fff;
+  --blue-pale: rgba(77,159,255,0.1);
+  --t1:        #e8eaf0;
+  --t2:        #8b8fa8;
+  --t3:        #4a4e63;
+  --t4:        #2e3244;
+  --border:    rgba(255,255,255,0.06);
+  --border2:   rgba(255,255,255,0.1);
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'DM Sans', sans-serif;
+  --r:         6px;
+  --r2:        10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { color-scheme: dark; }
+
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,204,0.012) 2px, rgba(0,229,204,0.012) 3px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+.header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  animation: slideDown 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hexagon {
+  width: 36px;
+  height: 36px;
+  position: relative;
+  animation: pulse-hex 3s ease-in-out infinite;
+}
+
+@keyframes pulse-hex {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--cyan)); }
+  50%       { filter: drop-shadow(0 0 10px var(--cyan)); }
+}
+
+.brand-text { display: flex; flex-direction: column; gap: 1px; }
+
+.brand-title {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--t1);
+  text-transform: uppercase;
+}
+
+.brand-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.status-dot {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t3);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--t3);
+}
+
+.dot.alive {
+  background: var(--green);
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.panel-run-btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--cyan);
+  border: none;
+  border-radius: var(--r);
+  padding: 9px 22px;
+  cursor: pointer;
+  transition: all 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel-run-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.15);
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+.panel-run-btn:hover::after { opacity: 1; }
+.panel-run-btn:active { transform: scale(0.97); }
+
+.panel-run-btn:disabled {
+  background: var(--bg4);
+  color: var(--t3);
+  cursor: not-allowed;
+}
+
+.panel-run-btn.running {
+  background: var(--bg4);
+  color: var(--cyan);
+  border: 1px solid var(--cyan-dim);
+}
+
+.sidebar {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeInLeft 0.6s 0.1s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+@keyframes fadeInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 8px;
+}
+
+.control-group { display: flex; flex-direction: column; gap: 6px; }
+
+.env-pills {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.env-pill {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  color: var(--t2);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+
+.env-pill:hover { border-color: var(--t3); color: var(--t1); }
+.env-pill.active-prod  { background: var(--red-pale);   border-color: var(--red);   color: var(--red);   }
+.env-pill.active-stage { background: var(--amber-pale); border-color: var(--amber); color: var(--amber); }
+.env-pill.active-dev   { background: var(--blue-pale);  border-color: var(--blue);  color: var(--blue);  }
+
+.field-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--t3);
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+select, input[type="text"] {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  color: var(--t1);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+select:focus, input[type="text"]:focus {
+  outline: none;
+  border-color: var(--cyan-dim);
+}
+
+select:hover, input[type="text"]:hover {
+  border-color: var(--border2);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.toggle-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t2);
+}
+
+.toggle {
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle.on { background: var(--cyan-dim); border-color: var(--cyan); }
+
+.toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--t2);
+  transition: all 0.2s;
+}
+
+.toggle.on .toggle-knob {
+  left: 16px;
+  background: var(--bg);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.score-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 10px 8px;
+}
+
+.score-card-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 4px;
+}
+
+.score-card-val {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--t2);
+}
+
+.score-card-val.cyan  { color: var(--cyan); }
+.score-card-val.green { color: var(--green); }
+.score-card-val.red   { color: var(--red); }
+.score-card-val.amber { color: var(--amber); }
+
+.main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fadeIn 0.5s 0.2s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.log-area {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--t4) transparent;
+}
+
+.log-area::-webkit-scrollbar { width: 3px; }
+.log-area::-webkit-scrollbar-thumb { background: var(--t4); border-radius: 2px; }
+
+.log-entry {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 1.5px 0;
+  animation: logSlide 0.15s ease;
+}
+
+@keyframes logSlide {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.log-ts  { color: var(--t4); font-size: 10px; white-space: nowrap; flex-shrink: 0; }
+.log-tag { width: 36px; text-align: right; font-size: 9px; letter-spacing: 0.08em; flex-shrink: 0; font-weight: 700; }
+.log-msg { color: var(--t2); word-break: break-word; flex: 1; }
+
+.log-entry.pass .log-tag { color: var(--green); }
+.log-entry.pass .log-msg { color: #9ae8c0; }
+.log-entry.fail .log-tag { color: var(--red); }
+.log-entry.fail .log-msg { color: #ffb3be; }
+.log-entry.warn .log-tag { color: var(--amber); }
+.log-entry.warn .log-msg { color: #ffe9a0; }
+.log-entry.info .log-tag { color: var(--cyan); }
+.log-entry.info .log-msg { color: var(--t2); }
+
+.prog-bar-wrap {
+  padding: 0 20px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+.prog-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.prog-bar-track {
+  width: 160px;
+  height: 3px;
+  background: var(--bg4);
+  border-radius: 2px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.prog-bar-fill {
+  height: 100%;
+  background: var(--cyan);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+
+.prog-pct {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--cyan);
+  width: 34px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.tabs-and-filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+
+.tab-row {
+  display: flex;
+  gap: 0;
+}
+
+.tab {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 11px 14px;
+  color: var(--t3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.tab:hover { color: var(--t1); }
+.tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+.filter-row {
+  display: flex;
+  gap: 4px;
+}
+
+.filter-chip {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  color: var(--t3);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.filter-chip:hover { color: var(--t1); border-color: var(--t3); }
+.filter-chip.active { background: var(--cyan-pale); border-color: var(--cyan-dim); color: var(--cyan); }
+
+.results-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--t4) transparent;
+}
+
+.results-area::-webkit-scrollbar { width: 3px; }
+.results-area::-webkit-scrollbar-thumb { background: var(--t4); border-radius: 2px; }
+
+.cat-block { margin-bottom: 20px; }
+
+.cat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cat-name {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+.cat-counts {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t4);
+  display: flex;
+  gap: 10px;
+}
+
+.cat-counts span { cursor: default; }
+
+.finding {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 10px;
+  align-items: start;
+  padding: 9px 12px;
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  margin-bottom: 4px;
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.finding::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  border-radius: 2px 0 0 2px;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.finding.status-fail::before  { background: var(--red); }
+.finding.status-pass::before  { background: var(--green); }
+.finding.status-warn::before  { background: var(--amber); }
+
+.finding:hover { border-color: var(--border2); background: var(--bg3); }
+.finding.expanded { border-color: var(--border2); }
+
+.status-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.status-icon.pass { background: var(--green-pale); color: var(--green); }
+.status-icon.fail { background: var(--red-pale);   color: var(--red);   }
+.status-icon.warn { background: var(--amber-pale); color: var(--amber); }
+.status-icon.skip { background: var(--bg4);        color: var(--t3);    }
+
+.finding-body { min-width: 0; }
+
+.finding-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t1);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.finding-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.finding-resource {
+  color: var(--t2);
+}
+
+.finding-detail {
+  display: none;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t2);
+  line-height: 1.7;
+}
+
+.finding-detail.show { display: block; animation: expand 0.2s ease; }
+
+@keyframes expand {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.detail-section { margin-bottom: 8px; }
+.detail-section:last-child { margin-bottom: 0; }
+
+.detail-title {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 4px;
+}
+
+.detail-body { color: var(--t1); line-height: 1.6; }
+
+.detail-ai {
+  border-left: 2px solid var(--cyan-dim);
+  padding-left: 10px;
+  color: var(--t1);
+  white-space: pre-wrap;
+}
+
+.sev-pill {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 3px;
+  font-weight: 700;
+}
+
+.sev-pill.critical { background: var(--red-pale);   color: var(--red);   border: 1px solid rgba(255,77,106,0.3); }
+.sev-pill.high     { background: var(--amber-pale); color: var(--amber); border: 1px solid rgba(255,184,48,0.3); }
+.sev-pill.medium   { background: var(--blue-pale);  color: var(--blue);  border: 1px solid rgba(77,159,255,0.3); }
+.sev-pill.low      { background: var(--bg4);        color: var(--t3);    border: 1px solid var(--border); }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--t3);
+  line-height: 2;
+}
+
+.empty-glyph {
+  font-size: 32px;
+  margin-bottom: 12px;
+  color: var(--t4);
+}
+
+.spinner {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--bg4);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.ai-summary-box {
+  margin: 0 20px 12px;
+  padding: 12px 14px;
+  background: var(--cyan-pale);
+  border: 1px solid var(--cyan-dim);
+  border-radius: var(--r2);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t1);
+  line-height: 1.8;
+  display: none;
+}
+
+.ai-summary-box.show { display: block; animation: fadeIn 0.4s ease; }
+
+.ai-summary-label {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.ollama-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cyan-dim);
+  border: 1px solid rgba(0,179,159,0.3);
+  border-radius: 20px;
+  padding: 2px 8px;
+}
+
+.ollama-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: blink 2s ease infinite;
+}
+
+.server-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+input[type="text"] {
+  font-size: 11px;
+}
+
+.model-select-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.refresh-btn {
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  color: var(--t2);
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.refresh-btn:hover { border-color: var(--cyan-dim); color: var(--cyan); }
+
+.gate-result {
+  display: none;
+  margin: 0 20px 12px;
+  padding: 10px 14px;
+  border-radius: var(--r);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.gate-result.pass-gate { background: var(--green-pale); border: 1px solid var(--green); color: var(--green); display: block; }
+.gate-result.fail-gate { background: var(--red-pale);   border: 1px solid var(--red);   color: var(--red);   display: block; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="header-brand">
+      <div class="hexagon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 3L32 10.5V25.5L18 33L4 25.5V10.5L18 3Z" stroke="#00e5cc" stroke-width="1.5" fill="rgba(0,229,204,0.06)"/>
+          <circle cx="18" cy="18" r="3.5" fill="#00e5cc" opacity="0.8"/>
+          <line x1="18" y1="7" x2="18" y2="14.5" stroke="#00e5cc" stroke-width="1.2" opacity="0.6"/>
+          <line x1="18" y1="21.5" x2="18" y2="29" stroke="#00e5cc" stroke-width="1.2" opacity="0.6"/>
+          <line x1="27.4" y1="12.5" x2="21.5" y2="16" stroke="#00e5cc" stroke-width="1.2" opacity="0.6"/>
+          <line x1="14.5" y1="20" x2="8.6" y2="23.5" stroke="#00e5cc" stroke-width="1.2" opacity="0.6"/>
+          <line x1="8.6" y1="12.5" x2="14.5" y2="16" stroke="#00e5cc" stroke-width="1.2" opacity="0.6"/>
+          <line x1="21.5" y1="20" x2="27.4" y2="23.5" stroke="#00e5cc" stroke-width="1.2" opacity="0.6"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title">K8s Linter</div>
+        <div class="brand-sub">v2.0 &mdash; agentic audit</div>
+      </div>
+    </div>
+    <div class="header-status">
+      <div class="ollama-badge">
+        <div class="ollama-dot"></div>
+        ollama
+      </div>
+      <div class="status-dot" id="server-status">
+        <div class="dot" id="server-dot"></div>
+        <span id="server-status-txt">checking…</span>
+      </div>
+      <button class="panel-run-btn" id="run-btn" onclick="runLint()">
+        <span id="btn-inner">▶&nbsp; Run Audit</span>
+      </button>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+
+    <div class="control-group">
+      <div class="section-label">Environment</div>
+      <div class="env-pills">
+        <div class="env-pill active-prod" id="pill-prod" onclick="setEnv('production')">Prod</div>
+        <div class="env-pill" id="pill-stage" onclick="setEnv('staging')">Stage</div>
+        <div class="env-pill" id="pill-dev" onclick="setEnv('development')">Dev</div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-label">Namespace</div>
+      <select id="ns-select" onchange="currentNs=this.value">
+        <option value="default">default</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <div class="section-label">Profile</div>
+      <select id="profile-select" onchange="currentProfile=this.value">
+        <option value="custom">Custom</option>
+        <option value="cis">CIS Benchmark</option>
+        <option value="nsa">NSA Hardening</option>
+      </select>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="control-group">
+      <div class="section-label">Ollama Config</div>
+      <div class="server-input-group">
+        <div>
+          <div class="field-label">Server URL</div>
+          <input type="text" id="ollama-url" value="http://localhost:11434" placeholder="http://host:11434">
+        </div>
+        <div>
+          <div class="field-label">Model</div>
+          <div class="model-select-row">
+            <select id="model-select" style="flex:1">
+              <option value="llama3">llama3</option>
+              <option value="llama3:8b">llama3:8b</option>
+              <option value="mistral">mistral</option>
+              <option value="codellama">codellama</option>
+              <option value="gemma2">gemma2</option>
+            </select>
+            <button class="refresh-btn" onclick="loadModels()" title="Fetch models from Ollama">&#8635;</button>
+          </div>
+        </div>
+        <div>
+          <div class="field-label">API Base</div>
+          <input type="text" id="api-base" value="http://localhost:8000" placeholder="http://localhost:8000">
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-label">Options</div>
+      <div class="toggle-row">
+        <div class="toggle-label">AI Remediation</div>
+        <div class="toggle on" id="toggle-ai" onclick="toggleAI()">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+      <div class="toggle-row" style="border:none">
+        <div class="toggle-label">Severity Gate</div>
+        <select id="gate-select" style="width:auto; font-size:10px; padding:4px 8px;">
+          <option value="high">High</option>
+          <option value="critical">Critical</option>
+          <option value="medium">Medium</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="control-group">
+      <div class="section-label">Score</div>
+      <div class="score-grid">
+        <div class="score-card">
+          <div class="score-card-label">Overall</div>
+          <div class="score-card-val cyan" id="sc-score">—</div>
+        </div>
+        <div class="score-card">
+          <div class="score-card-label">Grade</div>
+          <div class="score-card-val cyan" id="sc-grade">—</div>
+        </div>
+        <div class="score-card">
+          <div class="score-card-label">Passed</div>
+          <div class="score-card-val green" id="sc-pass">—</div>
+        </div>
+        <div class="score-card">
+          <div class="score-card-label">Failed</div>
+          <div class="score-card-val red" id="sc-fail">—</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <main class="main">
+
+    <div class="log-area" id="log-area">
+      <div class="log-entry info">
+        <span class="log-ts">--:--:--</span>
+        <span class="log-tag">INFO</span>
+        <span class="log-msg">K8s Linter ready. Configure settings and press Run Audit.</span>
+      </div>
+    </div>
+
+    <div class="prog-bar-wrap">
+      <span class="prog-label" id="prog-label">Idle</span>
+      <div class="prog-bar-track">
+        <div class="prog-bar-fill" id="prog-fill"></div>
+      </div>
+      <span class="prog-pct" id="prog-pct"></span>
+    </div>
+
+    <div class="ai-summary-box" id="ai-summary-box">
+      <div class="ai-summary-label">Ollama AI executive summary</div>
+      <div id="ai-summary-text"></div>
+    </div>
+
+    <div class="gate-result" id="gate-result"></div>
+
+    <div class="tabs-and-filters">
+      <div class="tab-row" id="tab-row">
+        <div class="tab active" data-tab="all" onclick="setTab('all')">All</div>
+        <div class="tab" data-tab="security" onclick="setTab('security')">Security</div>
+        <div class="tab" data-tab="reliability" onclick="setTab('reliability')">Reliability</div>
+        <div class="tab" data-tab="networking" onclick="setTab('networking')">Networking</div>
+        <div class="tab" data-tab="rbac" onclick="setTab('rbac')">RBAC</div>
+        <div class="tab" data-tab="resource" onclick="setTab('resource')">Resources</div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-chip active" data-f="all" onclick="setFilter('all')">All</div>
+        <div class="filter-chip" data-f="fail" onclick="setFilter('fail')">Fail</div>
+        <div class="filter-chip" data-f="pass" onclick="setFilter('pass')">Pass</div>
+        <div class="filter-chip" data-f="warn" onclick="setFilter('warn')">Warn</div>
+      </div>
+    </div>
+
+    <div class="results-area" id="results-area">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-glyph">&#9671;</div>
+        <div>No audit data yet.</div>
+        <div>Press <strong>Run Audit</strong> to begin.</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const CAT_MAP = {
+  security:'security','pod-security':'security',
+  reliability:'reliability',
+  networking:'networking',
+  rbac:'rbac',general:'rbac',
+  resources:'resource',resource:'resource',
+  secrets:'security',
+};
+
+const CAT_LABELS = {
+  security:'Security', reliability:'Reliability',
+  networking:'Networking', rbac:'RBAC & IAM', resource:'Resources',
+};
+
+let currentEnv     = 'production';
+let currentNs      = 'default';
+let currentProfile = 'custom';
+let currentTab     = 'all';
+let currentFilter  = 'all';
+let aiEnabled      = true;
+let isRunning      = false;
+let findings       = [];
+let fakeProgress   = 0;
+let ticker         = null;
+
+function getApiBase() { return document.getElementById('api-base').value.replace(/\/$/, ''); }
+function getOllamaUrl() { return document.getElementById('ollama-url').value; }
+function getModel() { return document.getElementById('model-select').value; }
+
+function setEnv(env) {
+  currentEnv = env;
+  ['prod','stage','dev'].forEach(k => document.getElementById('pill-'+k).className = 'env-pill');
+  const m = {production:'prod',staging:'stage',development:'dev'};
+  document.getElementById('pill-'+m[env]).className = 'env-pill active-'+m[env];
+}
+
+function setTab(t) {
+  currentTab = t;
+  document.querySelectorAll('.tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === t);
+  });
+  renderFindings();
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(el => {
+    el.classList.toggle('active', el.dataset.f === f);
+  });
+  renderFindings();
+}
+
+function toggleAI() {
+  aiEnabled = !aiEnabled;
+  const el = document.getElementById('toggle-ai');
+  el.classList.toggle('on', aiEnabled);
+}
+
+function ts() {
+  return new Date().toLocaleTimeString('en-GB', {hour12:false});
+}
+
+function addLog(type, msg) {
+  const area = document.getElementById('log-area');
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  const tag = type === 'pass' ? 'PASS' : type === 'fail' ? 'FAIL' : type === 'warn' ? 'WARN' : 'INFO';
+  entry.innerHTML = `<span class="log-ts">${ts()}</span><span class="log-tag">${tag}</span><span class="log-msg">${msg}</span>`;
+  area.appendChild(entry);
+  area.scrollTop = area.scrollHeight;
+}
+
+async function checkServer() {
+  try {
+    const r = await fetch(getApiBase() + '/api/profiles', {signal: AbortSignal.timeout(3000)});
+    const ok = r.ok;
+    document.getElementById('server-dot').className = 'dot' + (ok ? ' alive' : '');
+    document.getElementById('server-status-txt').textContent = ok ? 'server online' : 'server error';
+    if (ok) {
+      const data = await r.json();
+    }
+  } catch(e) {
+    document.getElementById('server-dot').className = 'dot';
+    document.getElementById('server-status-txt').textContent = 'server offline';
+  }
+}
+
+async function loadNamespaces() {
+  try {
+    const r = await fetch(getApiBase() + '/api/namespaces');
+    if (!r.ok) return;
+    const data = await r.json();
+    const sel = document.getElementById('ns-select');
+    sel.innerHTML = data.namespaces.map(n => `<option value="${n}">${n}</option>`).join('');
+    currentNs = sel.value;
+  } catch(e) {}
+}
+
+async function loadModels() {
+  try {
+    const ollamaUrl = getOllamaUrl();
+    const r = await fetch(ollamaUrl + '/api/tags', {signal: AbortSignal.timeout(4000)});
+    if (!r.ok) return;
+    const data = await r.json();
+    const models = (data.models || []).map(m => m.name);
+    if (!models.length) return;
+    const sel = document.getElementById('model-select');
+    const cur = sel.value;
+    sel.innerHTML = models.map(m => `<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+    addLog('info', `Loaded ${models.length} model(s) from Ollama`);
+  } catch(e) {
+    addLog('warn', 'Could not fetch Ollama models — using defaults');
+  }
+}
+
+function setProgress(pct, label) {
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct > 0 ? Math.round(pct) + '%' : '';
+  if (label) document.getElementById('prog-label').textContent = label.replace(/[^\x20-\x7E]/g, '').trim().slice(0, 80);
+}
+
+function startFakeTicker() {
+  fakeProgress = 0;
+  ticker = setInterval(() => {
+    fakeProgress = Math.min(fakeProgress + 1.2, 88);
+    setProgress(fakeProgress);
+  }, 600);
+}
+
+function stopFakeTicker() {
+  clearInterval(ticker);
+  ticker = null;
+}
+
+async function runLint() {
+  if (isRunning) return;
+  isRunning = true;
+  findings = [];
+
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  document.getElementById('btn-inner').innerHTML = '<span class="spinner"></span>&nbsp; Running…';
+  btn.className = 'panel-run-btn running';
+
+  document.getElementById('log-area').innerHTML = '';
+  document.getElementById('results-area').innerHTML = '';
+  document.getElementById('empty-state') && document.getElementById('empty-state').remove();
+  document.getElementById('ai-summary-box').className = 'ai-summary-box';
+  document.getElementById('gate-result').className = 'gate-result';
+
+  const ns     = document.getElementById('ns-select').value;
+  const prof   = document.getElementById('profile-select').value;
+  const model  = getModel();
+  const oUrl   = getOllamaUrl();
+
+  addLog('info', `Starting audit — ns=${ns} profile=${prof} model=${model}`);
+  startFakeTicker();
+
+  const payload = {
+    source:            'cluster',
+    namespace:         ns,
+    manifest_path:     './manifests',
+    profile:           prof,
+    provider:          'ollama',
+    model:             model,
+    ollama_url:        oUrl,
+    provider_base_url: '',
+    provider_api_key:  '',
+    ai_remediation:    aiEnabled,
+  };
+
+  try {
+    const resp = await fetch(getApiBase() + '/api/lint/stream', {
+      method:  'POST',
+      headers: {'Content-Type': 'application/json'},
+      body:    JSON.stringify(payload),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({detail: resp.statusText}));
+      throw new Error(err.detail || resp.statusText);
+    }
+
+    const reader  = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let   buffer  = '';
+
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, {stream: true});
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop();
+
+      for (const part of parts) {
+        if (!part.trim()) continue;
+        let eventType = 'log', dataLine = '';
+        for (const line of part.split('\n')) {
+          if (line.startsWith('event: ')) eventType = line.slice(7).trim();
+          if (line.startsWith('data: '))  dataLine  = line.slice(6).trim();
+        }
+        if (!dataLine) continue;
+
+        let text;
+        try { text = JSON.parse(dataLine); } catch(e) { text = dataLine; }
+
+        if (eventType === 'log') {
+          const t = /✔|PASS/.test(text) ? 'pass'
+                  : /✖|FAIL/.test(text) ? 'fail'
+                  : /WARN/.test(text)    ? 'warn' : 'info';
+          addLog(t, text);
+          setProgress(fakeProgress, text);
+
+        } else if (eventType === 'result') {
+          stopFakeTicker();
+          const data = typeof text === 'string' ? JSON.parse(text) : text;
+          findings = data.findings || [];
+
+          setProgress(100, 'Audit complete');
+          updateScoreCards(data);
+
+          if (data.ai_summary) {
+            document.getElementById('ai-summary-text').textContent = data.ai_summary;
+            document.getElementById('ai-summary-box').className = 'ai-summary-box show';
+          }
+
+          showGateResult(data);
+          renderFindings();
+          addLog('info', `Audit complete — ${findings.length} findings, score ${data.score}% [${data.grade}]`);
+
+        } else if (eventType === 'error') {
+          stopFakeTicker();
+          addLog('fail', 'Error: ' + text);
+          setProgress(0, 'Error');
+        }
+      }
+    }
+
+  } catch(e) {
+    stopFakeTicker();
+    setProgress(0, 'Connection error');
+    addLog('fail', 'API error: ' + e.message);
+    addLog('warn', 'Check: is uvicorn running? (uvicorn server:app --port 8000)');
+  }
+
+  btn.disabled = false;
+  document.getElementById('btn-inner').innerHTML = '&#9654;&nbsp; Re-run';
+  btn.className = 'panel-run-btn';
+  isRunning = false;
+}
+
+function updateScoreCards(data) {
+  const s = data.summary || {};
+  const scoreEl = document.getElementById('sc-score');
+  const sc = data.score || 0;
+  scoreEl.textContent = Math.round(sc) + '%';
+  scoreEl.className   = 'score-card-val ' + (sc >= 80 ? 'green' : sc >= 60 ? 'amber' : 'red');
+
+  const gradeEl = document.getElementById('sc-grade');
+  gradeEl.textContent = data.grade || '—';
+  gradeEl.className   = 'score-card-val ' + (data.grade === 'A' || data.grade === 'B' ? 'green' : data.grade === 'C' ? 'amber' : 'red');
+
+  document.getElementById('sc-pass').textContent = s.pass || 0;
+  document.getElementById('sc-fail').textContent = s.fail || 0;
+}
+
+function showGateResult(data) {
+  const gate = document.getElementById('gate-select').value;
+  const sevRank = {critical:0, high:1, medium:2, low:3};
+  const gateIdx = sevRank[gate] ?? 1;
+  const blocked = (data.findings || []).filter(f =>
+    f.status === 'fail' && (sevRank[f.severity] ?? 9) <= gateIdx
+  );
+  const el = document.getElementById('gate-result');
+  if (blocked.length) {
+    el.textContent = `CI gate FAILED — ${blocked.length} blocking finding(s) at or above "${gate}" severity`;
+    el.className = 'gate-result fail-gate';
+  } else {
+    el.textContent = `CI gate PASSED — no blocking findings at or above "${gate}" severity`;
+    el.className = 'gate-result pass-gate';
+  }
+}
+
+function iconChar(s) {
+  return s === 'pass' ? '✓' : s === 'fail' ? '✕' : s === 'warn' ? '!' : '–';
+}
+
+function renderFindings() {
+  const area = document.getElementById('results-area');
+  area.innerHTML = '';
+
+  const cats = currentTab === 'all'
+    ? ['security','reliability','networking','rbac','resource']
+    : [currentTab];
+
+  let totalRendered = 0;
+
+  cats.forEach(cat => {
+    let catFindings = findings.filter(f => (CAT_MAP[f.category] || 'resource') === cat);
+    if (currentFilter !== 'all') catFindings = catFindings.filter(f => f.status === currentFilter);
+    if (!catFindings.length) return;
+
+    const pass = catFindings.filter(f => f.status === 'pass').length;
+    const fail = catFindings.filter(f => f.status === 'fail').length;
+    const warn = catFindings.filter(f => f.status === 'warn').length;
+
+    const block = document.createElement('div');
+    block.className = 'cat-block';
+
+    const sevRank = {critical:0,high:1,medium:2,low:3};
+    catFindings.sort((a,b) => {
+      if (a.status === 'fail' && b.status !== 'fail') return -1;
+      if (b.status === 'fail' && a.status !== 'fail') return 1;
+      return (sevRank[a.severity]??9) - (sevRank[b.severity]??9);
+    });
+
+    block.innerHTML = `<div class="cat-head">
+      <span class="cat-name">${CAT_LABELS[cat] || cat}</span>
+      <div class="cat-counts">
+        <span style="color:var(--green)">${pass} pass</span>
+        <span style="color:var(--red)">${fail} fail</span>
+        <span style="color:var(--amber)">${warn} warn</span>
+      </div>
+    </div>`;
+
+    catFindings.forEach((f, idx) => {
+      const uid = `f-${f.rule_id || idx}-${f.resource_kind || ''}-${(f.resource_name||'').replace(/[^a-z0-9]/gi,'-')}-${idx}`;
+      const item = document.createElement('div');
+      item.className = `finding status-${f.status}`;
+
+      const detail = f.detail || '';
+      const desc   = detail.slice(0, 120) + (detail.length > 120 ? '…' : '');
+
+      const remAI  = f.remediation_ai   ? `<div class="detail-section"><div class="detail-title">Ollama AI Remediation</div><div class="detail-ai">${escHtml(f.remediation_ai)}</div></div>` : '';
+      const remSt  = f.remediation_static ? `<div class="detail-section"><div class="detail-title">Static Hint</div><div class="detail-body">${escHtml(f.remediation_static)}</div></div>` : '';
+      const detTxt = detail ? `<div class="detail-section"><div class="detail-title">Detail</div><div class="detail-body">${escHtml(detail)}</div></div>` : '';
+      const resLine = `<div class="detail-section"><div class="detail-title">Resource</div><div class="detail-body" style="font-family:var(--mono);color:var(--cyan)">${escHtml((f.resource_kind||'?')+'/'+( f.resource_name||'?'))}<span style="color:var(--t3);margin-left:10px">ns:${escHtml(f.namespace||'default')}</span></div></div>`;
+
+      item.innerHTML = `
+        <div class="status-icon ${f.status}">${iconChar(f.status)}</div>
+        <div class="finding-body">
+          <div class="finding-name">${escHtml(f.rule_name || f.rule_id || '—')}</div>
+          <div class="finding-meta">
+            <span class="finding-resource">${escHtml((f.resource_kind||'')+'/'+( f.resource_name||''))}</span>
+            <span style="color:var(--t4)">${escHtml(f.namespace||'')}</span>
+          </div>
+          <div class="check-desc" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px">${escHtml(desc)}</div>
+          <div class="finding-detail" id="${uid}">
+            ${remAI}${remSt}${detTxt}${resLine}
+          </div>
+        </div>
+        <span class="sev-pill ${f.severity||'low'}">${f.severity||'low'}</span>
+      `;
+
+      item.addEventListener('click', () => {
+        const d = document.getElementById(uid);
+        const expanded = d.classList.toggle('show');
+        item.classList.toggle('expanded', expanded);
+      });
+
+      block.appendChild(item);
+      totalRendered++;
+    });
+
+    area.appendChild(block);
+  });
+
+  if (!totalRendered) {
+    area.innerHTML = `<div class="empty-state">
+      <div class="empty-glyph">&#9671;</div>
+      <div>${findings.length ? 'No findings match the current filter.' : 'Press Run Audit to begin.'}</div>
+    </div>`;
+  }
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+checkServer();
+loadNamespaces();
+loadModels();
+
+setInterval(checkServer, 15000);
+setInterval(loadNamespaces, 30000);
+</script>
+</body>
+</html>
