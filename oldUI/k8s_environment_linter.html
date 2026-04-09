@@ -1,0 +1,637 @@
+
+<style>
+  :root {
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'Courier New', Consolas, Monaco, monospace;
+    
+    --color-background-primary: #0d0d0f;
+    --color-background-secondary: #1c1c1e;
+    --color-background-tertiary: #2c2c2e;
+    --color-background-success: #0d3d20;
+    --color-background-danger: #3d1212;
+    --color-background-warning: #3d2e0d;
+    --color-background-info: #0d2a3d;
+    
+    --color-text-primary: #f5f5f7;
+    --color-text-secondary: #a1a1a6;
+    --color-text-tertiary: #6e6e73;
+    --color-text-success: #30d158;
+    --color-text-danger: #ff453a;
+    --color-text-warning: #ffd60a;
+    --color-text-info: #64d2ff;
+    
+    --color-border-primary: #424245;
+    --color-border-secondary: #38383a;
+    --color-border-tertiary: #2c2c2e;
+    --color-border-success: #30d158;
+    --color-border-danger: #ff453a;
+    --color-border-warning: #ffd60a;
+    --color-border-info: #64d2ff;
+    
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px; 
+  }
+
+    .log-line:last-child::after {
+      content: '▊';
+      display: inline-block;
+      margin-left: 5px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }   
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { color-scheme: dark; }
+  body { background: #0d0d0f; }
+
+  #linter-root {
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    min-height: 600px;
+    padding: 0 0 2rem;
+  }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0 1.2rem;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    margin-bottom: 1.5rem;
+  }
+  .top-bar-left { display: flex; align-items: center; gap: 10px; }
+  .k8s-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--color-background-info);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .k8s-icon svg { width: 18px; height: 18px; }
+  .top-title { font-size: 15px; font-weight: 500; }
+  .top-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 1px; }
+
+  .run-btn {
+    background: var(--color-text-primary);
+    color: var(--color-background-primary);
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: opacity 0.15s;
+  }
+  .run-btn:hover { opacity: 0.8; }
+  .run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .run-btn.running { background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-secondary); }
+
+  .score-bar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .score-card {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 12px 14px;
+  }
+  .score-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .score-value { font-size: 22px; font-weight: 500; }
+  .score-value.pass { color: var(--color-text-success); }
+  .score-value.warn { color: var(--color-text-warning); }
+  .score-value.fail { color: var(--color-text-danger); }
+  .score-value.info { color: var(--color-text-info); }
+
+  .env-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .env-row label { font-size: 13px; color: var(--color-text-secondary); white-space: nowrap; }
+  .env-select {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-primary);
+    font-size: 13px;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .env-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 0.5px solid var(--color-border-tertiary);
+    color: var(--color-text-secondary);
+    background: var(--color-background-secondary);
+    transition: background 0.12s, color 0.12s;
+    white-space: nowrap;
+  }
+  .env-badge.active-prod { background: var(--color-background-danger); color: var(--color-text-danger); border-color: var(--color-border-danger); }
+  .env-badge.active-stage { background: var(--color-background-warning); color: var(--color-text-warning); border-color: var(--color-border-warning); }
+  .env-badge.active-dev { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
+
+  .section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.07em; }
+  .section-count { font-size: 12px; color: var(--color-text-tertiary); }
+
+  .check-group { margin-bottom: 1.5rem; }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-tertiary);
+    margin-bottom: 6px;
+    background: var(--color-background-primary);
+    cursor: pointer;
+    transition: border-color 0.12s;
+  }
+  .check-item:hover { border-color: var(--color-border-secondary); }
+  .check-item.expanded { border-color: var(--color-border-primary); }
+
+  .check-icon {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+    font-size: 11px; font-weight: 500;
+  }
+  .check-icon.pass { background: var(--color-background-success); color: var(--color-text-success); }
+  .check-icon.fail { background: var(--color-background-danger); color: var(--color-text-danger); }
+  .check-icon.warn { background: var(--color-background-warning); color: var(--color-text-warning); }
+  .check-icon.skip { background: var(--color-background-secondary); color: var(--color-text-tertiary); }
+  .check-icon.pending { background: var(--color-background-secondary); color: var(--color-text-tertiary); }
+
+  .check-body { flex: 1; min-width: 0; }
+  .check-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .check-desc { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+
+  .check-detail {
+    display: none;
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .check-detail.show { display: block; }
+  .check-detail code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--color-background-tertiary);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--color-text-primary);
+  }
+
+  .severity-pill {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+  .severity-pill.critical { background: var(--color-background-danger); color: var(--color-text-danger); }
+  .severity-pill.high { background: var(--color-background-warning); color: var(--color-text-warning); }
+  .severity-pill.medium { background: var(--color-background-info); color: var(--color-text-info); }
+  .severity-pill.low { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+
+  .progress-wrap { margin-bottom: 1.2rem; }
+  .progress-bar-bg { height: 4px; background: var(--color-background-secondary); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 2px; background: var(--color-text-success); transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+  .progress-label { font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px; display: flex; justify-content: space-between; }
+
+  .filter-row { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .filter-pill {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px; cursor: pointer;
+    border: 0.5px solid var(--color-border-tertiary);
+    color: var(--color-text-secondary); background: var(--color-background-primary);
+    transition: all 0.12s;
+  }
+  .filter-pill:hover, .filter-pill.active { background: var(--color-background-secondary); border-color: var(--color-border-secondary); color: var(--color-text-primary); }
+
+  .log-panel {
+    background: #0a0a0c;
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-tertiary);
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    min-height: 120px;
+    max-height: 220px;
+    overflow-y: auto;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-secondary) transparent;
+  }
+  .log-panel::-webkit-scrollbar { width: 4px; }
+  .log-panel::-webkit-scrollbar-track { background: transparent; }
+  .log-panel::-webkit-scrollbar-thumb { background: var(--color-border-secondary); border-radius: 2px; }
+  .log-line { display: flex; gap: 10px; align-items: baseline; padding: 1px 0; }
+  .log-time { color: #3a3a3c; flex-shrink: 0; font-size: 10px; letter-spacing: 0.03em; }
+  .log-prefix { flex-shrink: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; width: 36px; text-align: right; }
+  .log-msg { flex: 1; word-break: break-word; }
+  .log-pass .log-prefix { color: var(--color-text-success); }
+  .log-pass .log-msg   { color: #c8f7d8; }
+  .log-fail .log-prefix { color: var(--color-text-danger); }
+  .log-fail .log-msg   { color: #ffc5c2; }
+  .log-warn .log-prefix { color: var(--color-text-warning); }
+  .log-warn .log-msg   { color: #fff0a0; }
+  .log-info .log-prefix { color: var(--color-text-info); }
+  .log-info .log-msg   { color: var(--color-text-secondary); }
+  .log-line-new { animation: fadeIn 0.15s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+  .tab-row { display: flex; gap: 2px; margin-bottom: 1.2rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .tab {
+    font-size: 12px; padding: 6px 14px; cursor: pointer;
+    color: var(--color-text-secondary); border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: color 0.12s;
+  }
+  .tab:hover { color: var(--color-text-primary); }
+  .tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); font-weight: 500; }
+
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--color-border-secondary); border-top-color: var(--color-text-secondary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<div id="linter-root">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="k8s-icon">
+        <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 1.5L15.5 5.25V12.75L9 16.5L2.5 12.75V5.25L9 1.5Z" stroke="var(--color-text-info)" stroke-width="1.2" fill="none"/>
+          <circle cx="9" cy="9" r="2" fill="var(--color-text-info)"/>
+          <line x1="9" y1="3.5" x2="9" y2="7" stroke="var(--color-text-info)" stroke-width="1.1"/>
+          <line x1="9" y1="11" x2="9" y2="14.5" stroke="var(--color-text-info)" stroke-width="1.1"/>
+          <line x1="13.7" y1="6.25" x2="10.7" y2="8" stroke="var(--color-text-info)" stroke-width="1.1"/>
+          <line x1="7.3" y1="10" x2="4.3" y2="11.75" stroke="var(--color-text-info)" stroke-width="1.1"/>
+          <line x1="4.3" y1="6.25" x2="7.3" y2="8" stroke="var(--color-text-info)" stroke-width="1.1"/>
+          <line x1="10.7" y1="10" x2="13.7" y2="11.75" stroke="var(--color-text-info)" stroke-width="1.1"/>
+        </svg>
+      </div>
+      <div>
+        <div class="top-title">K8s Environment Linter</div>
+        <div class="top-sub">Deployment readiness &amp; security audit</div>
+      </div>
+    </div>
+    <button class="run-btn" id="run-btn" onclick="runLint()">
+      <span id="btn-icon">▶</span> Run Lint
+    </button>
+  </div>
+
+  <div class="env-row">
+    <label>Environment:</label>
+    <span class="env-badge active-prod" id="badge-prod" onclick="setEnv('production')">production</span>
+    <span class="env-badge" id="badge-stage" onclick="setEnv('staging')">staging</span>
+    <span class="env-badge" id="badge-dev" onclick="setEnv('development')">development</span>
+    <label style="margin-left:12px">Namespace:</label>
+    <select class="env-select" id="ns-select" onchange="setNs(this.value)">
+      <option value="default">default</option>
+      <option value="kube-system">kube-system</option>
+      <option value="monitoring">monitoring</option>
+      <option value="widgetbot">widgetbot</option>
+      <option value="milvus">milvus</option>
+    </select>
+    <label style="margin-left:12px">Profile:</label>
+    <select class="env-select" id="profile-select" onchange="setProfile(this.value)">
+      <option value="cis">CIS Benchmark</option>
+      <option value="nsa">NSA Hardening</option>
+      <option value="custom">Custom</option>
+    </select>
+  </div>
+
+  <div class="score-bar" id="score-bar">
+    <div class="score-card"><div class="score-label">Overall Score</div><div class="score-value info" id="sc-overall">—</div></div>
+    <div class="score-card"><div class="score-label">Passed</div><div class="score-value pass" id="sc-pass">—</div></div>
+    <div class="score-card"><div class="score-label">Failures</div><div class="score-value fail" id="sc-fail">—</div></div>
+    <div class="score-card"><div class="score-label">Warnings</div><div class="score-value warn" id="sc-warn">—</div></div>
+  </div>
+
+  <div class="progress-wrap" id="progress-wrap" style="display:none">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="prog-label">Running checks…</span><span id="prog-pct">0%</span></div>
+  </div>
+
+  <div class="log-panel" id="log-panel">
+    <div class="log-line log-info"><span class="log-time">--:--:--</span><span class="log-prefix">INFO</span><span class="log-msg">Select environment and press Run Lint to start audit.</span></div>
+  </div>
+
+  <div class="tab-row">
+    <div class="tab active" id="tab-all" onclick="setTab('all')">All checks</div>
+    <div class="tab" id="tab-security" onclick="setTab('security')">Security</div>
+    <div class="tab" id="tab-reliability" onclick="setTab('reliability')">Reliability</div>
+    <div class="tab" id="tab-networking" onclick="setTab('networking')">Networking</div>
+    <div class="tab" id="tab-rbac" onclick="setTab('rbac')">RBAC &amp; IAM</div>
+    <div class="tab" id="tab-resource" onclick="setTab('resource')">Resources</div>
+  </div>
+
+  <div class="filter-row">
+    <span class="filter-pill active" id="f-all" onclick="setFilter('all')">All</span>
+    <span class="filter-pill" id="f-fail" onclick="setFilter('fail')">Failures only</span>
+    <span class="filter-pill" id="f-warn" onclick="setFilter('warn')">Warnings only</span>
+    <span class="filter-pill" id="f-pass" onclick="setFilter('pass')">Passed only</span>
+  </div>
+
+  <div id="checks-container"></div>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:8000';
+
+// category mapping from backend to UI tab keys
+const CAT_MAP = {
+  'security': 'security', 'pod-security': 'security',
+  'reliability': 'reliability',
+  'networking': 'networking',
+  'rbac': 'rbac', 'general': 'rbac',
+  'resources': 'resource', 'resource': 'resource',
+  'secrets': 'security',
+};
+const CAT_LABELS = {
+  security: 'Security', reliability: 'Reliability',
+  networking: 'Networking', rbac: 'RBAC & IAM', resource: 'Resources',
+};
+
+let currentEnv = 'production';
+let currentNs = 'default';
+let currentProfile = 'Custom';
+let currentTab = 'all';
+let currentFilter = 'all';
+let lintFindings = [];   // real findings from API
+let isRunning = false;
+
+function setEnv(env) {
+  currentEnv = env;
+  ['prod','stage','dev'].forEach(e => {
+    document.getElementById('badge-'+e).className = 'env-badge';
+  });
+  const map = {production:'prod', staging:'stage', development:'dev'};
+  document.getElementById('badge-'+map[env]).className = 'env-badge active-'+map[env];
+}
+function setNs(v) { currentNs = v; }
+function setProfile(v) { currentProfile = v; }
+
+function setTab(t) {
+  currentTab = t;
+  ['all','security','reliability','networking','rbac','resource'].forEach(x => {
+    document.getElementById('tab-'+x).className = 'tab'+(x===t?' active':'');
+  });
+  renderFindings();
+}
+function setFilter(f) {
+  currentFilter = f;
+  ['all','fail','warn','pass'].forEach(x => {
+    document.getElementById('f-'+x).className = 'filter-pill'+(x===f?' active':'');
+  });
+  renderFindings();
+}
+
+function iconChar(r) { return r==='pass'?'✓':r==='fail'?'✕':r==='warn'?'!':'–'; }
+
+function addLog(type, msg) {
+  const panel = document.getElementById('log-panel');
+  const div = document.createElement('div');
+  div.className = `log-line log-${type} log-line-new`;
+  
+  const ts = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  div.innerHTML = `
+    <span class="log-time">${ts}</span>
+    <span class="log-prefix">${type.toUpperCase()}</span>
+    <span class="log-msg">${msg}</span>
+  `;
+  
+  panel.appendChild(div);
+  
+  // Keep the user at the bottom of the logs
+  panel.scrollTo({ top: panel.scrollHeight, behavior: 'smooth' });
+}
+
+async function runLint() {
+  if (isRunning) return;
+  isRunning = true;
+  lintFindings = [];
+
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Running…';
+  btn.className = 'run-btn running';
+
+  document.getElementById('progress-wrap').style.display = 'block';
+  document.getElementById('prog-fill').style.width = '0%';
+  document.getElementById('prog-pct').textContent = '0%';
+  document.getElementById('prog-label').textContent = 'Connecting to linter…';
+  document.getElementById('log-panel').innerHTML = '';
+  document.getElementById('checks-container').innerHTML = '';
+
+  addLog('info', 'Streaming from ' + API_BASE + '/api/lint/stream');
+
+  let fakeProgress = 0;
+  const ticker = setInterval(() => {
+    fakeProgress = Math.min(fakeProgress + 1, 90);
+    document.getElementById('prog-fill').style.width = fakeProgress + '%';
+    document.getElementById('prog-pct').textContent = fakeProgress + '%';
+  }, 600);
+
+  try {
+    const resp = await fetch(API_BASE + '/api/lint/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source: 'cluster',
+        namespace: currentNs,
+        profile: currentProfile,
+        provider: 'ollama',
+        model: '',
+        ollama_url: 'http://192.168.0.7:11434',
+        ai_remediation: true,
+      }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ detail: resp.statusText }));
+      throw new Error(err.detail || resp.statusText);
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop();
+
+      for (const part of parts) {
+        if (!part.trim()) continue;
+        let eventType = 'log', dataLine = '';
+        for (const line of part.split('\n')) {
+          if (line.startsWith('event: ')) eventType = line.slice(7).trim();
+          if (line.startsWith('data: '))  dataLine  = line.slice(6).trim();
+        }
+        if (!dataLine) continue;
+        const text = JSON.parse(dataLine);
+
+        if (eventType === 'log') {
+          const t = text.includes('✔') || text.includes('PASS') ? 'pass'
+                  : text.includes('✖') || text.includes('FAIL') ? 'fail'
+                  : text.includes('WARN') ? 'warn' : 'info';
+          addLog(t, text);
+          document.getElementById('prog-label').textContent = text.replace(/[^\x20-\x7E]/g, '').trim().slice(0, 70);
+
+        } else if (eventType === 'result') {
+          clearInterval(ticker);
+          const data = JSON.parse(text);
+          lintFindings = data.findings || [];
+          document.getElementById('prog-fill').style.width = '100%';
+          document.getElementById('prog-pct').textContent = '100%';
+          document.getElementById('prog-label').textContent = 'Lint complete.';
+          const s = data.summary || {};
+          const score = data.score;
+          document.getElementById('sc-overall').textContent = score + '%  [' + data.grade + ']';
+          document.getElementById('sc-overall').className = 'score-value ' + (score >= 80 ? 'pass' : score >= 60 ? 'warn' : 'fail');
+          document.getElementById('sc-pass').textContent = s.pass || 0;
+          document.getElementById('sc-fail').textContent = s.fail || 0;
+          document.getElementById('sc-warn').textContent = s.warn || 0;
+          if (data.ai_summary) addLog('info', 'AI: ' + data.ai_summary.slice(0, 120) + '…');
+          addLog('info', 'Audit complete — ' + lintFindings.length + ' findings.');
+          renderFindings();
+
+        } else if (eventType === 'error') {
+          clearInterval(ticker);
+          addLog('fail', 'Error: ' + text);
+        }
+      }
+    }
+
+  } catch(e) {
+    clearInterval(ticker);
+    document.getElementById('prog-label').textContent = 'Error.';
+    addLog('fail', 'API error: ' + e.message);
+    addLog('warn', 'Is the server running?  uvicorn server:app --port 8000');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '▶ Re-run';
+  btn.className = 'run-btn';
+  isRunning = false;
+}
+
+function renderFindings() {
+  const container = document.getElementById('checks-container');
+  container.innerHTML = '';
+
+  const cats = currentTab === 'all'
+    ? ['security','reliability','networking','rbac','resource']
+    : [currentTab];
+
+  cats.forEach(uiCat => {
+    // collect findings that map to this UI category
+    let findings = lintFindings.filter(f => (CAT_MAP[f.category] || 'resource') === uiCat);
+
+    if (currentFilter !== 'all') findings = findings.filter(f => f.status === currentFilter);
+    if (!findings.length) return;
+
+    const pass = findings.filter(f => f.status==='pass').length;
+    const fail = findings.filter(f => f.status==='fail').length;
+    const warn = findings.filter(f => f.status==='warn').length;
+
+    const group = document.createElement('div');
+    group.className = 'check-group';
+    group.innerHTML =
+      '<div class="section-head">'+
+        '<span class="section-title">'+CAT_LABELS[uiCat]+'</span>'+
+        '<span class="section-count">'+pass+' pass · '+fail+' fail · '+warn+' warn</span>'+
+      '</div>';
+
+    // sort: failures first, then by severity weight
+    const sevW = {critical:0, high:1, medium:2, low:3};
+    findings.sort((a,b) => {
+      if (a.status==='fail' && b.status!=='fail') return -1;
+      if (b.status==='fail' && a.status!=='fail') return 1;
+      return (sevW[a.severity]||9) - (sevW[b.severity]||9);
+    });
+
+    findings.forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'check-item';
+
+      const detailHtml =
+        (f.remediation_ai
+          ? '<strong>AI Remediation:</strong><br>'+f.remediation_ai.replace(/\n/g,'<br>')
+          : f.remediation_static
+            ? '<strong>Hint:</strong> '+f.remediation_static
+            : '')+
+        (f.detail ? '<br><br><strong>Detail:</strong> '+f.detail : '')+
+        '<br><strong>Resource:</strong> <code>'+f.resource_kind+'/'+f.resource_name+'</code>'+
+        (f.namespace ? '  <code>ns: '+f.namespace+'</code>' : '');
+
+      item.innerHTML =
+        '<div class="check-icon '+f.status+'">'+iconChar(f.status)+'</div>'+
+        '<div class="check-body">'+
+          '<div class="check-name">'+f.rule_name+'</div>'+
+          '<div class="check-desc">'+f.detail.slice(0,100)+'</div>'+
+          '<div class="check-detail" id="detail-'+f.rule_id+'-'+f.resource_name+'">'+detailHtml+'</div>'+
+        '</div>'+
+        '<span class="severity-pill '+f.severity+'">'+f.severity+'</span>';
+
+      item.addEventListener('click', () => {
+        const d = item.querySelector('.check-detail');
+        const expanded = d.classList.toggle('show');
+        item.classList.toggle('expanded', expanded);
+      });
+      group.appendChild(item);
+    });
+
+    container.appendChild(group);
+  });
+
+  if (!container.children.length) {
+    container.innerHTML = '<div style="color:var(--color-text-tertiary);font-size:13px;padding:1rem 0">'+
+      (lintFindings.length ? 'No findings match the current filter.' : 'Press Run Lint to start the audit.')+
+    '</div>';
+  }
+}
+
+// init
+renderFindings();
+
+async function loadNamespaces() {
+    try {
+        const resp = await fetch(API_BASE + '/api/namespaces');
+        const data = await resp.json();
+        const sel = document.getElementById('ns-select');
+        sel.innerHTML = data.namespaces
+            .map(n => `<option value="${n}">${n}</option>`)
+            .join('');
+    } catch(e) {
+        console.warn('Could not load namespaces:', e);
+    }
+}
+loadNamespaces();   // call on page load
+
+// no legacy stubs needed
+const CHECKS = [];
+</script>
