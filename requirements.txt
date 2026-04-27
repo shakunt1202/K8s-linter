@@ -1,0 +1,17 @@
+# ── Core (required) ───────────────────────────────────────────────────
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.0.0
+pyyaml>=6.0
+
+# ── AI Providers (install what you need) ──────────────────────────────
+# Anthropic Claude  → pip install anthropic
+anthropic>=0.28.0
+
+# OpenAI / Groq / Together / Azure / LM Studio
+# → pip install openai
+openai>=1.30.0
+
+# ── Dev / testing ─────────────────────────────────────────────────────
+pytest>=8.0.0
+httpx>=0.27.0        # for TestClient
