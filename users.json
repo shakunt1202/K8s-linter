@@ -1,0 +1,20 @@
+[
+  {
+    "username": "admin",
+    "password": "admin123",
+    "role": "admin",
+    "active": true
+  },
+  {
+    "username": "demo",
+    "password": "demo",
+    "role": "viewer",
+    "active": true
+  },
+  {
+    "username": "k8s",
+    "password": "linter",
+    "role": "operator",
+    "active": true
+  }
+]

@@ -47,9 +47,11 @@ app.add_middleware(
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
 PROFILE_MAP = {
-    "cis":    "profiles/cis-benchmark.yaml",
-    "nsa":    "profiles/nsa-hardening.yaml",
-    "custom": "profiles/custom.yaml",
+    "cis":           "profiles/cis-benchmark.yaml",
+    "cis-benchmark": "profiles/cis-benchmark.yaml",
+    "nsa":           "profiles/nsa-hardening.yaml",
+    "nsa-hardening": "profiles/nsa-hardening.yaml",
+    "custom":        "profiles/custom.yaml",
 }
 
 # JSON-file user store — swap for a real DB in production
@@ -156,11 +158,20 @@ def health():
 
 @app.get("/api/profiles")
 def list_profiles():
+    # Human-readable labels for known profiles
+    LABELS = {
+        "cis-benchmark": "CIS Benchmark",
+        "nsa-hardening": "NSA Hardening",
+        "custom":        "Custom",
+    }
     profiles_dir = Path("profiles")
     if not profiles_dir.exists():
         return {"profiles": [{"value": "custom", "label": "Custom"}]}
     return {"profiles": [
-        {"value": p.stem, "label": p.stem.replace("-", " ").replace("_", " ").title(), "path": str(p)}
+        {
+            "value": p.stem,
+            "label": LABELS.get(p.stem, p.stem.replace("-", " ").replace("_", " ").title()),
+        }
         for p in sorted(profiles_dir.glob("*.yaml"))
     ]}
 
@@ -179,6 +190,22 @@ def list_namespaces():
     except (FileNotFoundError, subprocess.TimeoutExpired, json.JSONDecodeError):
         pass
     return {"namespaces": ["default"]}
+
+
+@app.get("/api/ollama/models")
+async def list_ollama_models(url: str = "http://localhost:11434"):
+    """Proxy Ollama /api/tags to avoid browser CORS issues (no extra packages needed)."""
+    import urllib.request, urllib.error, json as _json
+    target = url.rstrip("/") + "/api/tags"
+    try:
+        req = urllib.request.Request(target, headers={"Accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = _json.loads(resp.read())
+            return {"models": [m["name"] for m in data.get("models", [])]}
+    except urllib.error.URLError as exc:
+        raise HTTPException(status_code=502, detail=f"Cannot reach Ollama at {url}: {exc.reason}")
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Ollama error: {exc}")
 
 
 @app.get("/api/providers")

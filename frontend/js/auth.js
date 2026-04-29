@@ -36,7 +36,11 @@ function initAuth({ onSuccess } = {}) {
   const remembered = localStorage.getItem('k8s_linter_session');
   if (remembered) {
     const u = (loadUsers() || []).find(x => x.username === remembered && x.active);
-    if (u) { _currentUser = u; onSuccess && onSuccess(u); return; }
+    if (u) {
+      showApp(u);          // show the app and update UI
+      onSuccess && onSuccess(u);
+      return;
+    }
   }
   _showLoginScreen();
 }
@@ -55,6 +59,8 @@ function showApp(user) {
   const ls = document.getElementById('login-screen');
   ls.classList.add('hidden');
   setTimeout(() => { ls.style.display = 'none'; }, 450);
+  // update avatar/role in the header
+  window.__updateUserUI && window.__updateUserUI();
 }
 
 function doLogin() {

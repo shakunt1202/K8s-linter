@@ -114,7 +114,8 @@ class LinterAgent:
     async def run(self) -> AuditResults:
         # ── Stage 1: Profile ──────────────────────────────────────────────────
         print("[1/5] Loading compliance profile...")
-        profile = ProfileLoader(self.profile_path).load()
+        loop = asyncio.get_event_loop()
+        profile = await loop.run_in_executor(None, lambda: ProfileLoader(self.profile_path).load())
         rules   = profile.enabled_rules()
         print(f"PROFILE  {profile.name} v{profile.version}")
         print(f"RULES    {len(rules)} checks enabled")
@@ -124,7 +125,7 @@ class LinterAgent:
 
         # ── Stage 2: Resources ────────────────────────────────────────────────
         print("[2/5] Fetching Kubernetes resources...")
-        resources = self._fetch_resources()
+        resources = await loop.run_in_executor(None, self._fetch_resources)
         print(f"FETCHED  {len(resources)} resource(s) from ns={self.namespace} src={self.source}")
         for r in resources:
             print(f"RESOURCE {r.kind}/{r.name} ns={r.namespace} src={r.source}")
@@ -132,7 +133,7 @@ class LinterAgent:
         # ── Stage 3: Check engine ─────────────────────────────────────────────
         print("[3/5] Running check engine...")
         engine   = CheckEngine(rules)
-        findings = engine.evaluate_verbose(resources, log_fn=print)
+        findings = await loop.run_in_executor(None, lambda: engine.evaluate_verbose(resources, log_fn=print))
         n_pass = sum(1 for f in findings if f.status == "pass")
         n_fail = sum(1 for f in findings if f.status == "fail")
         print(f"ENGINE   {len(findings)} findings - pass={n_pass} fail={n_fail}")

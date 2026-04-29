@@ -1,6 +1,37 @@
 /**
  * ui.js — Findings rendering, score display, tabs, filters, env state
  */
+const STORAGE_KEY = 'k8s-linter-ui';
+
+function saveUIState() {
+  const state = {
+    namespace: document.getElementById('ns-select')?.value,
+    ollamaUrl: document.getElementById('ollama-url')?.value,
+    model: document.getElementById('model-select')?.value,
+    provider: document.getElementById('ai-provider-select')?.value,
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadUIState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+
+  const state = JSON.parse(raw);
+
+  if (state.namespace)
+    document.getElementById('ns-select').value = state.namespace;
+
+  if (state.ollamaUrl)
+    document.getElementById('ollama-url').value = state.ollamaUrl;
+
+  if (state.model)
+    document.getElementById('model-select').value = state.model;
+
+  if (state.provider)
+    document.getElementById('ai-provider-select').value = state.provider;
+}
+
 
 'use strict';
 
