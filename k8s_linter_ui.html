@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,399 +7,425 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <style>
-
-/* ── Theme CSS variables (inlined from theme.css) ── */
-:root, [data-theme="light"] {
-  --bg: #f4f5f7;
-  --bg-mesh: none;
-  --surface:   #ffffff;
-  --surface-2: #f8f9fa;
-  --surface-3: #f1f3f5;
-  --glass-border: #e1e4e8;
-  --glass-shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
-  --glass-hover:  0 2px 6px rgba(0,0,0,.10), 0 8px 24px rgba(0,0,0,.08);
-  --divider: #e1e4e8;
-  --t1: #0d1117;
-  --t2: #24292f;
-  --t3: #57606a;
-  --t4: #8c959f;
-  --accent:      #0969da;
-  --accent-mid:  rgba(9,105,218,0.25);
-  --accent-soft: rgba(9,105,218,0.08);
-  --green:      #1a7f37;
-  --green-soft: rgba(26,127,55,0.10);
-  --red:        #cf222e;
-  --red-soft:   rgba(207,34,46,0.10);
-  --amber:      #9a6700;
-  --amber-soft: rgba(154,103,0,0.10);
-  --blue:       #0550ae;
-  --blue-soft:  rgba(5,80,174,0.10);
+/* ── Theme tokens ── */
+:root,[data-theme="light"]{
+  --bg:#f4f5f7;--surface:#ffffff;--surface-2:#f8f9fa;--surface-3:#f1f3f5;
+  --glass-border:#e1e4e8;--glass-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --glass-hover:0 2px 6px rgba(0,0,0,.10),0 8px 24px rgba(0,0,0,.08);
+  --divider:#e1e4e8;--t1:#0d1117;--t2:#24292f;--t3:#57606a;--t4:#8c959f;
+  --accent:#0969da;--accent-mid:rgba(9,105,218,0.25);--accent-soft:rgba(9,105,218,0.08);
+  --green:#1a7f37;--green-soft:rgba(26,127,55,0.10);
+  --red:#cf222e;--red-soft:rgba(207,34,46,0.10);
+  --amber:#9a6700;--amber-soft:rgba(154,103,0,0.10);
+  --blue:#0550ae;--blue-soft:rgba(5,80,174,0.10);
+  --purple:#7c3aed;--purple-soft:rgba(124,58,237,0.10);
 }
-[data-theme="dark"] {
-  --bg: #0d1117;
-  --bg-mesh: none;
-  --surface:   #161b22;
-  --surface-2: #1c2128;
-  --surface-3: #21262d;
-  --glass-border: #30363d;
-  --glass-shadow: 0 1px 3px rgba(0,0,0,.30), 0 4px 16px rgba(0,0,0,.24);
-  --glass-hover:  0 2px 6px rgba(0,0,0,.36), 0 8px 24px rgba(0,0,0,.28);
-  --divider: #21262d;
-  --t1: #e6edf3;
-  --t2: #c9d1d9;
-  --t3: #8b949e;
-  --t4: #484f58;
-  --accent:      #388bfd;
-  --accent-mid:  rgba(56,139,253,0.30);
-  --accent-soft: rgba(56,139,253,0.12);
-  --green:      #3fb950;
-  --green-soft: rgba(63,185,80,0.12);
-  --red:        #f85149;
-  --red-soft:   rgba(248,81,73,0.12);
-  --amber:      #d29922;
-  --amber-soft: rgba(210,153,34,0.12);
-  --blue:       #79c0ff;
-  --blue-soft:  rgba(121,192,255,0.12);
+[data-theme="dark"]{
+  --bg:#0f1117;--surface:#161b22;--surface-2:#1c2128;--surface-3:#21262d;
+  --glass-border:#30363d;--glass-shadow:0 1px 3px rgba(0,0,0,.32),0 4px 16px rgba(0,0,0,.24);
+  --glass-hover:0 2px 6px rgba(0,0,0,.38),0 8px 24px rgba(0,0,0,.28);
+  --divider:#21262d;--t1:#e6edf3;--t2:#c9d1d9;--t3:#8b949e;--t4:#484f58;
+  --accent:#388bfd;--accent-mid:rgba(56,139,253,0.30);--accent-soft:rgba(56,139,253,0.12);
+  --green:#3fb950;--green-soft:rgba(63,185,80,0.12);
+  --red:#f85149;--red-soft:rgba(248,81,73,0.12);
+  --amber:#d29922;--amber-soft:rgba(210,153,34,0.12);
+  --blue:#79c0ff;--blue-soft:rgba(121,192,255,0.12);
+  --purple:#a78bfa;--purple-soft:rgba(167,139,250,0.12);
 }
-
-/* Base resets */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-body {
-  font-family: 'Outfit', sans-serif;
-  background: var(--bg);
-  background-image: var(--bg-mesh);
-  background-attachment: fixed;
-  color: var(--t1);
-}
-input, select, button, textarea {
-  font-family: inherit;
-  font-size: inherit;
-}
-select, input[type="text"], input[type="password"], input[type="url"] {
-  width: 100%;
-  background: var(--surface-2);
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
-  color: var(--t1);
-  padding: 8px 12px;
-  outline: none;
-  appearance: none;
-  transition: border-color .2s ease, box-shadow .2s ease;
-}
-select:focus, input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-/* Animations */
-@keyframes slideDown    { from { opacity:0; transform:translateY(-12px) } to { opacity:1; transform:none } }
-@keyframes fadeLeft     { from { opacity:0; transform:translateX(-16px) } to { opacity:1; transform:none } }
-@keyframes fadeIn       { from { opacity:0 } to { opacity:1 } }
-@keyframes cardRise     { from { opacity:0; transform:scale(.96) translateY(16px) } to { opacity:1; transform:none } }
-@keyframes dropIn       { from { opacity:0; transform:scale(.95) translateY(-6px) } to { opacity:1; transform:none } }
-@keyframes popIn        { from { opacity:0; transform:scale(.92) } to { opacity:1; transform:none } }
-@keyframes cardIn       { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:none } }
-@keyframes expandDetail { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:none } }
-@keyframes logSlide     { from { opacity:0; transform:translateX(-6px) } to { opacity:1; transform:none } }
-@keyframes spin         { to { transform:rotate(360deg) } }
-@keyframes gentle-pulse { 0%,100%{opacity:1}50%{opacity:.6} }
-@keyframes pulse-dot    { 0%,100%{box-shadow:0 0 0 0 currentColor}50%{box-shadow:0 0 0 4px transparent} }
-
 </style>
 <style>
-/* Component styles — theme vars in /frontend/css/theme.css */
-.app{display:grid;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr;height:100vh;width:100vw;overflow:hidden;position:fixed;top:0;left:0;z-index:1}
-
-/* ── Top bar ─────────────────────────────────────────────────────── */
-.score-strip {position:sticky;top:0;z-index:1000;
-  grid-column:1/-1; display:flex; align-items:stretch;
-  background:var(--surface);
-  border-bottom:1px solid var(--divider); box-shadow:none;
-  height:56px; animation:slideDown .5s cubic-bezier(.22,1,.36,1) both;
+/* ── Base ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);overflow:hidden}
+input,select,button,textarea{font-family:inherit;font-size:inherit}
+select,input[type="text"],input[type="password"],input[type="url"]{
+  width:100%;background:var(--surface-2);border:1px solid var(--glass-border);
+  border-radius:8px;color:var(--t1);padding:7px 11px;outline:none;appearance:none;
+  transition:border-color .2s,box-shadow .2s;font-size:13px;
 }
-.score-brand{display:flex;align-items:center;gap:11px;padding:0 20px;border-right:1px solid var(--divider);flex-shrink:0;width:260px}
-.hex-icon{width:30px;height:30px;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(91,127,255,.3));transition:filter .3s ease,transform .3s ease;animation:gentle-pulse 4s ease-in-out infinite}
-.hex-icon:hover{transform:rotate(15deg) scale(1.1)}
-.brand-text-wrap{display:flex;flex-direction:column;gap:1px}
-.brand-name{font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--t1)}
+select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+/* ── Animations ── */
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes dropIn{from{opacity:0;transform:scale(.95) translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes expandDetail{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes logSlide{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes gentle-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 currentColor}50%{box-shadow:0 0 0 4px transparent}}
+@keyframes bar-grow{from{width:0}to{width:var(--w)}}
+@keyframes chart-rise{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:scaleY(1)}}
+@keyframes ring-fill{from{stroke-dashoffset:283}to{stroke-dashoffset:var(--dash)}}
+@keyframes count-up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── Layout ── */
+.app{display:grid;grid-template-columns:268px 1fr;grid-template-rows:52px 1fr;height:100vh;width:100vw;position:fixed;inset:0}
+
+/* ── Top bar ── */
+.topbar{
+  grid-column:1/-1;display:flex;align-items:stretch;
+  background:var(--surface);border-bottom:1px solid var(--divider);
+  height:52px;z-index:200;animation:slideDown .45s cubic-bezier(.22,1,.36,1) both;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:0 18px;border-right:1px solid var(--divider);width:268px;flex-shrink:0}
+.brand-icon{width:28px;height:28px;flex-shrink:0;animation:gentle-pulse 4s ease-in-out infinite}
+.brand-name{font-size:13px;font-weight:600;letter-spacing:.03em;color:var(--t1)}
 .brand-ver{font-family:'Geist Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:.06em;opacity:.8}
-.score-metrics{display:flex;flex:1;align-items:stretch}
-.score-metric{display:flex;align-items:center;gap:8px;padding:0 14px;border-right:1px solid var(--divider);min-width:0;transition:background .2s ease}
-.score-metric:last-child{border-right:none}
-.score-metric:hover{background:var(--accent-soft)}
-.sm-label{font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--t3);white-space:nowrap}
-.sm-val{font-family:'Geist Mono',monospace;font-size:18px;font-weight:400;color:var(--t2);transition:color .4s ease;white-space:nowrap}
-.sm-val.cyan{color:var(--accent)}.sm-val.green{color:var(--green)}.sm-val.red{color:var(--red)}.sm-val.amber{color:var(--amber)}
-.score-actions{display:flex;align-items:center;gap:8px;padding:0 14px;margin-left:auto;flex-shrink:0}
-
-/* ── Theme toggle ────────────────────────────────────────────────── */
-.theme-btn{display:flex;align-items:center;gap:7px;background:var(--surface-2);border:1px solid var(--glass-border);border-radius:20px;padding:5px 12px 5px 7px;cursor:pointer;transition:all .25s ease;backdrop-filter:blur(8px)}
+.metrics{display:flex;flex:1;align-items:stretch;overflow:hidden}
+.metric{display:flex;align-items:center;gap:7px;padding:0 13px;border-right:1px solid var(--divider);cursor:default;transition:background .15s}
+.metric:hover{background:var(--accent-soft)}
+.metric:last-child{border-right:none}
+.m-lbl{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);white-space:nowrap}
+.m-val{font-family:'Geist Mono',monospace;font-size:17px;font-weight:400;color:var(--t2);transition:color .3s;white-space:nowrap}
+.m-val.cyan{color:var(--accent)}.m-val.green{color:var(--green)}.m-val.red{color:var(--red)}.m-val.amber{color:var(--amber)}
+.topbar-actions{display:flex;align-items:center;gap:7px;padding:0 12px;margin-left:auto;flex-shrink:0}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--t4);transition:all .3s}
+.dot.alive{background:var(--green);box-shadow:0 0 0 3px var(--green-soft);animation:pulse-dot 2.5s ease infinite}
+.srv-stat{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t3);font-family:'Geist Mono',monospace;letter-spacing:.04em}
+.provider-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:500;letter-spacing:.04em;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-mid);border-radius:20px;padding:3px 9px}
+.o-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse-dot 2.5s ease infinite}
+.theme-btn{display:flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--glass-border);border-radius:20px;padding:4px 10px 4px 6px;cursor:pointer;transition:all .2s}
 .theme-btn:hover{background:var(--surface-3)}
-.theme-track{width:28px;height:16px;border-radius:8px;background:var(--t4);position:relative;transition:background .3s ease}
+.theme-track{width:26px;height:15px;border-radius:8px;background:var(--t4);position:relative;transition:background .3s}
 [data-theme="dark"] .theme-track{background:var(--accent)}
-.theme-knob{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:white;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:all .3s cubic-bezier(.34,1.56,.64,1)}
-[data-theme="dark"] .theme-knob{left:14px}
-.theme-label{font-size:11px;font-weight:500;color:var(--t2);letter-spacing:.02em}
-
-/* ── Run / Stop ──────────────────────────────────────────────────── */
-.run-btn{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:.03em;color:white;background:#0969da;border:none;border-radius:6px;padding:8px 20px;cursor:pointer;transition:all .15s ease;white-space:nowrap;box-shadow:none}
-.run-btn:hover{background:#0860ca}
-.run-btn:active{background:#0757ba}
-.run-btn:disabled{background:var(--t4);color:var(--t3);cursor:not-allowed}
+.theme-knob{position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+[data-theme="dark"] .theme-knob{left:13px}
+.theme-lbl{font-size:11px;font-weight:500;color:var(--t2)}
+.run-btn{font-size:13px;font-weight:600;color:white;background:var(--accent);border:none;border-radius:7px;padding:7px 18px;cursor:pointer;transition:all .15s;white-space:nowrap;letter-spacing:.02em}
+.run-btn:hover{filter:brightness(1.1)}
+.run-btn:disabled{background:var(--t4);color:var(--t3);cursor:not-allowed;filter:none}
 .run-btn.running{background:var(--surface-2);color:var(--accent);border:1px solid var(--accent-mid)}
-.stop-btn{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:.03em;color:white;background:var(--red);border:none;border-radius:6px;padding:8px 16px;cursor:pointer;transition:all .15s ease;white-space:nowrap;display:none;align-items:center;gap:6px}
+.stop-btn{font-size:13px;font-weight:600;color:white;background:var(--red);border:none;border-radius:7px;padding:7px 14px;cursor:pointer;transition:all .15s;display:none;align-items:center;gap:5px}
 .stop-btn:hover{opacity:.88}
 .stop-btn.visible{display:flex}
-
-/* ── User avatar + dropdown ──────────────────────────────────────── */
 .user-menu-wrap{position:relative}
-
-/* FIX: explicit hex gradient — never depends on a CSS var that may be undefined */
-.user-avatar {
-  width:34px; height:34px; border-radius:50%;
-  background:linear-gradient(135deg,#5b7fff 0%,#a78bfa 100%);
-  border:2px solid rgba(255,255,255,0.35);
-  display:flex; align-items:center; justify-content:center;
-  font-size:13px; font-weight:700; color:white; letter-spacing:.03em;
-  cursor:pointer; transition:all .25s ease;
-  box-shadow:0 2px 12px rgba(91,127,255,.45);
-  user-select:none; flex-shrink:0;
-}
-[data-theme="dark"] .user-avatar{
-  background:linear-gradient(135deg,#6b8fff 0%,#a78bfa 100%);
-  border-color:rgba(255,255,255,0.15);
-  box-shadow:0 2px 12px rgba(107,143,255,.45);
-}
-.user-avatar:hover{transform:scale(1.1);box-shadow:0 4px 20px rgba(91,127,255,.6)}
-
-.user-dropdown {
-  position:absolute; top:calc(100% + 10px); right:0;
-  background:var(--surface); backdrop-filter:blur(24px) saturate(1.8); -webkit-backdrop-filter:blur(24px) saturate(1.8);
-  border:1px solid var(--glass-border); border-radius:16px; box-shadow:var(--glass-shadow);
-  min-width:220px; z-index:9999; overflow:hidden; display:none;
-}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5b7fff,#a78bfa);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;cursor:pointer;transition:all .2s;user-select:none;flex-shrink:0}
+.user-avatar:hover{transform:scale(1.08)}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--surface);border:1px solid var(--glass-border);border-radius:12px;box-shadow:var(--glass-shadow);min-width:200px;z-index:9999;overflow:hidden;display:none}
 .user-dropdown.open{display:block;animation:dropIn .2s cubic-bezier(.34,1.56,.64,1)}
-.ud-header{padding:14px 16px 10px;border-bottom:1px solid var(--divider)}
+.ud-header{padding:12px 14px 9px;border-bottom:1px solid var(--divider)}
 .ud-name{font-size:13px;font-weight:600;color:var(--t1)}
 .ud-role{font-size:10px;color:var(--t3);letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
-.ud-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s ease}
+.ud-item{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s}
 .ud-item:hover{background:var(--accent-soft);color:var(--t1)}
 .ud-item.danger{color:var(--red)}
 .ud-item.danger:hover{background:var(--red-soft)}
-.ud-item svg{width:14px;height:14px;flex-shrink:0;opacity:.7}
-.ud-divider{height:1px;background:var(--divider);margin:4px 0}
-
-/* status indicators */
-.dot{width:7px;height:7px;border-radius:50%;background:var(--t4);transition:all .3s ease}
-.dot.alive{background:var(--green);box-shadow:0 0 0 3px var(--green-soft);animation:pulse-dot 2.5s ease infinite}
-.server-stat{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t3)}
-.ollama-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:500;letter-spacing:.04em;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-mid);border-radius:20px;padding:3px 9px}
-.o-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse-dot 2.5s ease infinite}
-
-/* ── Sidebar ─────────────────────────────────────────────────────── */
-.sidebar{font-family:'Outfit',sans-serif;font-size:13px;background:var(--surface-2);border-right:1px solid var(--divider);padding:16px 12px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--divider) transparent;min-height:0}
-.sec-lbl{font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
-.ctrl-grp{display:flex;flex-direction:column;gap:6px}
+.ud-item svg{width:13px;height:13px;flex-shrink:0;opacity:.7}
+.ud-divider{height:1px;background:var(--divider);margin:3px 0}
+</style>
+<style>
+/* ── Sidebar ── */
+.sidebar{
+  background:var(--surface);border-right:1px solid var(--divider);
+  display:flex;flex-direction:column;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--divider) transparent;
+  animation:fadeIn .4s ease both;
+}
+.sidebar-inner{padding:14px 12px;display:flex;flex-direction:column;gap:14px;flex:1}
+.sec-lbl{font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:7px}
+.ctrl-grp{display:flex;flex-direction:column;gap:7px}
 .fld-lbl{font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--t3);margin-bottom:3px}
+.divider-line{height:1px;background:var(--divider);margin:2px 0}
+
+/* env pills */
 .env-pills{display:flex;gap:5px;flex-wrap:wrap}
-.env-pill{font-size:12px;font-weight:500;padding:5px 11px;border-radius:6px;border:1px solid var(--divider);color:var(--t2);background:var(--surface-2);cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);backdrop-filter:blur(8px)}
-.env-pill:hover{background:var(--surface-3);border-color:var(--glass-border)}
-.env-pill.active-prod{background:var(--red-soft);border-color:var(--red);color:var(--red);box-shadow:0 2px 10px rgba(240,80,110,.15)}
-.env-pill.active-stage{background:var(--amber-soft);border-color:var(--amber);color:var(--amber);box-shadow:0 2px 10px rgba(245,158,11,.15)}
-.env-pill.active-dev{background:var(--blue-soft);border-color:var(--blue);color:var(--blue);box-shadow:0 2px 10px rgba(59,130,246,.15)}
+.env-pill{font-size:12px;font-weight:500;padding:5px 12px;border-radius:7px;border:1px solid var(--divider);color:var(--t2);background:var(--surface-2);cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.env-pill:hover{background:var(--surface-3)}
+.env-pill.active-prod{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.env-pill.active-stage{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
+.env-pill.active-dev{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+
+/* source tabs */
+.src-tabs{display:flex;gap:4px;background:var(--surface-2);border-radius:9px;padding:3px}
+.src-tab{flex:1;font-size:11px;font-weight:600;padding:5px 0;border-radius:7px;border:none;background:transparent;color:var(--t3);cursor:pointer;transition:all .2s;text-align:center;letter-spacing:.02em}
+.src-tab.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.src-panel{display:none;flex-direction:column;gap:7px;animation:fadeIn .2s ease}
+.src-panel.active{display:flex}
+
+/* git config */
+.git-cfg{background:var(--surface-2);border:1px solid var(--glass-border);border-radius:10px;padding:10px 11px;display:flex;flex-direction:column;gap:7px}
+.git-cfg-title{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:5px}
+
+/* model row */
 .model-row{display:flex;gap:5px;align-items:center}
-.ref-btn{background:var(--surface-2);border:1px solid var(--glass-border);border-radius:10px;color:var(--t2);font-size:13px;padding:7px 10px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);flex-shrink:0}
-.ref-btn:hover{border-color:var(--accent-mid);color:var(--accent);background:var(--surface);transform:rotate(180deg)}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--divider)}
+.ref-btn{background:var(--surface-2);border:1px solid var(--glass-border);border-radius:8px;color:var(--t2);font-size:13px;padding:6px 9px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);flex-shrink:0}
+.ref-btn:hover{border-color:var(--accent-mid);color:var(--accent);transform:rotate(180deg)}
+
+/* toggles */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--divider)}
 .toggle-lbl{font-family:'Outfit',sans-serif;font-size:13px;font-weight:400;color:var(--t2)}
-.toggle{width:34px;height:19px;border-radius:10px;background:var(--t4);border:none;position:relative;cursor:pointer;transition:background .3s ease;box-shadow:inset 0 1px 3px rgba(0,0,0,.1);flex-shrink:0}
+.toggle{width:32px;height:18px;border-radius:9px;background:var(--t4);border:none;position:relative;cursor:pointer;transition:background .3s;flex-shrink:0}
 .toggle.on{background:var(--accent)}
-.toggle-knob{position:absolute;top:2.5px;left:2.5px;width:14px;height:14px;border-radius:50%;background:white;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:all .3s cubic-bezier(.34,1.56,.64,1)}
-.toggle.on .toggle-knob{left:17.5px}
-.divider{height:1px;background:var(--divider);margin:2px 0}
-.provider-tabs{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
-.ptab{font-size:10px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--divider);color:var(--t3);cursor:pointer;transition:all .2s ease;background:transparent}
+.toggle-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.toggle.on .toggle-knob{left:16px}
+
+/* provider tabs */
+.provider-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px}
+.ptab{font-size:10px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--divider);color:var(--t3);cursor:pointer;transition:all .2s;background:transparent}
 .ptab:hover{color:var(--t1);background:var(--surface-2)}
 .ptab.active{background:var(--accent-soft);border-color:var(--accent-mid);color:var(--accent)}
 .token-field{position:relative}
-.token-field input{padding-right:32px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.03em}
-.token-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:0;transition:color .2s ease}
+.token-field input{padding-right:30px;font-family:'Geist Mono',monospace;font-size:10px}
+.token-eye{position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:0;transition:color .2s}
 .token-eye:hover{color:var(--accent)}
+</style>
+<style>
+/* ── Main content ── */
+.main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);animation:fadeIn .4s .1s ease both}
 
-/* ── Main content ────────────────────────────────────────────────── */
-.main{display:flex;flex-direction:column;overflow-y:auto;animation:fadeIn .4s .12s ease both;min-height:0}
-.log-header{display:flex;align-items:center;justify-content:space-between;padding:8px 18px;background:var(--surface);border-bottom:1px solid var(--divider)}
-.log-header-title{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
-.log-clear-btn{font-size:11px;font-weight:500;color:var(--t3);background:none;border:1px solid transparent;cursor:pointer;padding:3px 10px;border-radius:8px;transition:all .2s ease}
+/* log panel */
+.log-header{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;background:var(--surface);border-bottom:1px solid var(--divider);flex-shrink:0}
+.log-header-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+.log-clear-btn{font-size:11px;font-weight:500;color:var(--t3);background:none;border:1px solid transparent;cursor:pointer;padding:3px 9px;border-radius:7px;transition:all .2s}
 .log-clear-btn:hover{color:var(--t1);background:var(--surface-2);border-color:var(--divider)}
-.log-area{background:var(--surface-3);border-bottom:1px solid var(--divider);padding:10px 18px;font-family:'Geist Mono',monospace;font-size:11px;height:190px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--divider) transparent}
-.log-entry{display:flex;gap:10px;align-items:baseline;padding:2px 0;animation:logSlide .15s ease both}
-.log-ts{color:var(--t4);font-size:9px;white-space:nowrap;flex-shrink:0;width:60px}
-.log-tag{font-size:9px;letter-spacing:.08em;flex-shrink:0;font-weight:500;width:52px;text-align:right}
+.log-area{background:var(--surface-3);border-bottom:1px solid var(--divider);padding:8px 16px;font-family:'Geist Mono',monospace;font-size:11px;height:160px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--divider) transparent;flex-shrink:0}
+.log-entry{display:flex;gap:9px;align-items:baseline;padding:2px 0;animation:logSlide .15s ease both}
+.log-ts{color:var(--t4);font-size:9px;white-space:nowrap;flex-shrink:0;width:58px}
+.log-tag{font-size:9px;letter-spacing:.08em;flex-shrink:0;font-weight:600;width:50px;text-align:right}
 .log-msg{color:var(--t2);word-break:break-word;flex:1;line-height:1.6}
 .log-entry.pass .log-tag{color:var(--green)}.log-entry.pass .log-msg{color:var(--green);opacity:.85}
 .log-entry.fail .log-tag{color:var(--red)}.log-entry.fail .log-msg{color:var(--red);opacity:.85}
 .log-entry.warn .log-tag{color:var(--amber)}.log-entry.warn .log-msg{color:var(--amber);opacity:.85}
 .log-entry.info .log-tag{color:var(--accent)}.log-entry.info .log-msg{color:var(--t2)}
 .log-entry.rule .log-tag{color:var(--blue)}.log-entry.rule .log-msg{color:var(--blue);opacity:.8}
-.log-entry.resource .log-tag{color:#a855f7}.log-entry.resource .log-msg{color:#a855f7;opacity:.8}
-.prog-wrap{display:flex;align-items:center;gap:12px;padding:0 18px;height:32px;background:var(--surface);border-bottom:1px solid var(--divider)}
-.prog-lbl{font-size:11px;font-weight:400;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-.prog-track{width:150px;height:4px;background:var(--divider);border-radius:4px;flex-shrink:0;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent) 0%,#a78bfa 100%);border-radius:4px;width:0%;transition:width .6s cubic-bezier(.22,1,.36,1)}
-.prog-pct{font-family:'Geist Mono',monospace;font-size:10px;color:var(--accent);width:34px;text-align:right;flex-shrink:0}
-.notice-area{padding:0 14px}
-.gate-bar,.ai-bar{font-size:12px;font-weight:400;border-radius:14px;padding:8px 14px;margin-top:10px;display:none}
-.gate-bar.pass-gate{background:var(--green-soft);border:1px solid rgba(16,185,129,.25);color:var(--green);display:block;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
-.gate-bar.fail-gate{background:var(--red-soft);border:1px solid rgba(240,80,110,.25);color:var(--red);display:block;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
-.ai-bar.show{display:block;background:var(--accent-soft);border:1px solid var(--accent-mid);color:var(--t1);backdrop-filter:blur(8px);animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
-.ai-bar-lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600}
-.env-badge{display:inline-flex;align-items:center;gap:5px;font-family:'Geist Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px;border:1px solid}
+.log-entry.resource .log-tag{color:var(--purple)}.log-entry.resource .log-msg{color:var(--purple);opacity:.8}
+
+/* progress */
+.prog-wrap{display:flex;align-items:center;gap:10px;padding:0 16px;height:30px;background:var(--surface);border-bottom:1px solid var(--divider);flex-shrink:0}
+.prog-lbl{font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.prog-track{width:130px;height:3px;background:var(--divider);border-radius:3px;flex-shrink:0;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:3px;width:0%;transition:width .5s cubic-bezier(.22,1,.36,1)}
+.prog-pct{font-family:'Geist Mono',monospace;font-size:10px;color:var(--accent);width:32px;text-align:right;flex-shrink:0}
+
+/* notices */
+.notice-area{padding:0 12px;flex-shrink:0}
+.gate-bar,.ai-bar{font-size:12px;border-radius:10px;padding:7px 13px;margin-top:8px;display:none}
+.gate-bar.pass-gate{background:var(--green-soft);border:1px solid rgba(63,185,80,.25);color:var(--green);display:block;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+.gate-bar.fail-gate{background:var(--red-soft);border:1px solid rgba(248,81,73,.25);color:var(--red);display:block;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+.ai-bar.show{display:block;background:var(--accent-soft);border:1px solid var(--accent-mid);color:var(--t1);animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+.ai-bar-lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:700}
+
+/* env badge */
+.env-badge{display:inline-flex;align-items:center;gap:4px;font-family:'Geist Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:20px;border:1px solid}
 .env-badge.prod{background:var(--red-soft);border-color:var(--red);color:var(--red)}
 .env-badge.stage{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
 .env-badge.dev{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
-.tabs-row{display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--divider);background:var(--surface);position:sticky;top:0;z-index:10}
-.tabs{display:flex}
-.tab{font-size:12px;font-weight:500;padding:12px 14px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s ease;white-space:nowrap}
+
+/* ── View tabs (Charts / Findings) ── */
+.view-tabs-row{display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--divider);background:var(--surface);flex-shrink:0}
+.view-tabs{display:flex}
+.view-tab{font-size:12px;font-weight:500;padding:11px 13px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.view-tab:hover{color:var(--t1)}
+.view-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+/* Category sub-row — only visible in Findings view */
+.cat-tabs-row{display:none;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--divider);background:var(--surface-2);flex-shrink:0}
+.cat-tabs-row.visible{display:flex}
+.cat-tabs{display:flex}
+.tab{font-size:12px;font-weight:500;padding:9px 13px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
 .tab:hover{color:var(--t1)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .filters{display:flex;gap:4px;align-items:center}
-.fchip{font-size:10px;font-weight:500;padding:3px 11px;border-radius:20px;border:1px solid var(--divider);color:var(--t3);cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);background:transparent}
-.fchip:hover{color:var(--t1);border-color:var(--glass-border);background:var(--surface-2);transform:translateY(-1px)}
-.fchip.active{background:var(--accent-soft);border-color:var(--accent-mid);color:var(--accent);box-shadow:0 2px 8px var(--accent-soft)}
-.results{padding:16px;scrollbar-width:thin;scrollbar-color:var(--divider) transparent}
-.cat-block{margin-bottom:20px}
-.cat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--divider)}
-.cat-name{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
-.cat-counts{font-family:'Geist Mono',monospace;font-size:10px;display:flex;gap:10px}
-.finding{display:grid;grid-template-columns:24px 1fr auto;gap:10px;align-items:start;padding:10px 14px;border-radius:8px;border:1px solid var(--divider);margin-bottom:4px;background:var(--surface);cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease;position:relative;overflow:hidden}
-.finding::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:14px 0 0 14px;background:transparent;transition:background .2s ease}
+.fchip{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid var(--divider);color:var(--t3);cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);background:transparent}
+.fchip:hover{color:var(--t1);border-color:var(--glass-border);background:var(--surface-2)}
+.fchip.active{background:var(--accent-soft);border-color:var(--accent-mid);color:var(--accent)}
+
+/* ── Content panels ── */
+.content-area{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--divider) transparent}
+.view-panel{display:none}
+.view-panel.active{display:block;animation:fadeIn .25s ease}
+
+/* ── Charts panel ── */
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;padding:16px}
+.chart-card{background:var(--surface);border:1px solid var(--glass-border);border-radius:14px;padding:18px;box-shadow:var(--glass-shadow);animation:cardIn .4s cubic-bezier(.22,1,.36,1) both}
+.chart-card:nth-child(2){animation-delay:.06s}
+.chart-card:nth-child(3){animation-delay:.12s}
+.chart-card:nth-child(4){animation-delay:.18s}
+.chart-card:nth-child(5){animation-delay:.24s}
+.chart-card:nth-child(6){animation-delay:.30s}
+.chart-title{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.chart-title svg{width:13px;height:13px;opacity:.7}
+.chart-wrap{position:relative;height:180px;display:flex;align-items:center;justify-content:center}
+.chart-wrap canvas{max-height:180px}
+
+/* score ring */
+.score-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.score-ring{position:relative;width:130px;height:130px}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring-bg{fill:none;stroke:var(--divider);stroke-width:10}
+.score-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1),stroke .4s}
+.score-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-ring-pct{font-family:'Geist Mono',monospace;font-size:26px;font-weight:400;color:var(--t1);line-height:1}
+.score-ring-grade{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.06em;margin-top:2px}
+.score-stats{display:flex;gap:16px}
+.score-stat{text-align:center}
+.score-stat-val{font-family:'Geist Mono',monospace;font-size:20px;font-weight:400;line-height:1;animation:count-up .5s ease both}
+.score-stat-lbl{font-size:10px;color:var(--t3);margin-top:3px;font-weight:500}
+
+/* bar chart */
+.bar-chart{display:flex;flex-direction:column;gap:8px;width:100%}
+.bar-row{display:flex;align-items:center;gap:9px}
+.bar-label{font-size:11px;color:var(--t2);width:80px;flex-shrink:0;text-align:right;font-weight:500}
+.bar-track{flex:1;height:8px;background:var(--surface-3);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;width:0;transition:width 1s cubic-bezier(.22,1,.36,1)}
+.bar-count{font-family:'Geist Mono',monospace;font-size:10px;color:var(--t3);width:28px;text-align:right;flex-shrink:0}
+
+/* severity breakdown */
+.sev-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.sev-card{background:var(--surface-2);border-radius:10px;padding:12px;text-align:center;border:1px solid var(--glass-border);transition:transform .2s}
+.sev-card:hover{transform:translateY(-2px)}
+.sev-card-val{font-family:'Geist Mono',monospace;font-size:24px;font-weight:400;line-height:1;animation:count-up .6s ease both}
+.sev-card-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+.sev-card.critical .sev-card-val{color:var(--red)}.sev-card.critical .sev-card-lbl{color:var(--red)}
+.sev-card.high .sev-card-val{color:var(--amber)}.sev-card.high .sev-card-lbl{color:var(--amber)}
+.sev-card.medium .sev-card-val{color:var(--blue)}.sev-card.medium .sev-card-lbl{color:var(--blue)}
+.sev-card.low .sev-card-val{color:var(--t3)}.sev-card.low .sev-card-lbl{color:var(--t3)}
+
+/* ── Findings panel ── */
+.results{padding:14px}
+.cat-block{margin-bottom:18px}
+.cat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--divider)}
+.cat-name{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.cat-counts{font-family:'Geist Mono',monospace;font-size:10px;display:flex;gap:9px}
+.finding{display:grid;grid-template-columns:22px 1fr auto;gap:9px;align-items:start;padding:9px 12px;border-radius:9px;border:1px solid var(--divider);margin-bottom:4px;background:var(--surface);cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s;position:relative;overflow:hidden;animation:cardIn .3s ease both}
+.finding::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:9px 0 0 9px;background:transparent;transition:background .2s}
 .finding.status-fail::before{background:var(--red)}.finding.status-pass::before{background:var(--green)}.finding.status-warn::before{background:var(--amber)}
-.finding:hover{border-color:var(--accent-mid);box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.finding.expanded{border-color:var(--accent);}
-.s-icon{width:24px;height:24px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:11px;font-weight:500;flex-shrink:0}
+.finding:hover{border-color:var(--accent-mid);box-shadow:0 2px 8px rgba(0,0,0,.08);transform:translateY(-1px)}
+.finding.expanded{border-color:var(--accent)}
+.s-icon{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:10px;font-weight:600;flex-shrink:0}
 .s-icon.pass{background:var(--green-soft);color:var(--green)}.s-icon.fail{background:var(--red-soft);color:var(--red)}.s-icon.warn{background:var(--amber-soft);color:var(--amber)}.s-icon.skip{background:var(--surface-2);color:var(--t3)}
 .f-body{min-width:0}
 .f-name{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f-meta{font-family:'Geist Mono',monospace;font-size:9px;color:var(--t3);display:flex;gap:8px;flex-wrap:wrap}
-.f-res{color:var(--t2)}.f-desc{font-size:11px;color:var(--t3);margin-top:2px}
-.f-detail{display:none;margin-top:10px;padding:12px 14px;background:var(--surface-3);border:1px solid var(--divider);border-radius:6px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--t2);line-height:1.8;user-select:text;cursor:text}
+.f-meta{font-family:'Geist Mono',monospace;font-size:9px;color:var(--t3);display:flex;gap:7px;flex-wrap:wrap}
+.f-desc{font-size:11px;color:var(--t3);margin-top:2px}
+.f-detail{display:none;margin-top:9px;padding:11px 13px;background:var(--surface-3);border:1px solid var(--divider);border-radius:7px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--t2);line-height:1.8;user-select:text;cursor:text}
 .f-detail.show{display:block;animation:expandDetail .2s cubic-bezier(.22,1,.36,1)}
-.d-sec{margin-bottom:10px}.d-sec:last-child{margin-bottom:0}
-.d-ttl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px;font-weight:600;font-family:'Outfit',sans-serif}
-.d-body{color:var(--t1);line-height:1.7}.d-ai{border-left:3px solid var(--accent-mid);padding-left:10px;color:var(--t1);white-space:pre-wrap;user-select:text;cursor:text}
-.sev-pill{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:2px}
-.sev-pill.critical{background:var(--red-soft);color:var(--red);border:1px solid rgba(240,80,110,.2)}
-.sev-pill.high{background:var(--amber-soft);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
-.sev-pill.medium{background:var(--blue-soft);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.d-sec{margin-bottom:9px}.d-sec:last-child{margin-bottom:0}
+.d-ttl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px;font-weight:700;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:space-between}
+.d-body{color:var(--t1);line-height:1.7}.d-ai{border-left:3px solid var(--accent-mid);padding-left:9px;color:var(--t1);white-space:pre-wrap}
+.sev-pill{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.sev-pill.critical{background:var(--red-soft);color:var(--red);border:1px solid rgba(248,81,73,.2)}
+.sev-pill.high{background:var(--amber-soft);color:var(--amber);border:1px solid rgba(210,153,34,.2)}
+.sev-pill.medium{background:var(--blue-soft);color:var(--blue);border:1px solid rgba(121,192,255,.2)}
 .sev-pill.low{background:var(--surface-2);color:var(--t3);border:1px solid var(--divider)}
 .empty-state{text-align:center;padding:60px 20px;font-size:13px;color:var(--t3);line-height:2.4}
-.empty-glyph{font-size:32px;margin-bottom:12px;color:var(--t4);animation:gentle-pulse 4s ease-in-out infinite}
-.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--accent-soft);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+.empty-glyph{font-size:30px;margin-bottom:10px;color:var(--t4);animation:gentle-pulse 4s ease-in-out infinite}
+.spinner{display:inline-block;width:10px;height:10px;border:2px solid var(--accent-soft);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
 
-/* ── Modals ──────────────────────────────────────────────────────── */
-.modal-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
+/* ── Glass toast notification ── */
+@keyframes toastIn{from{opacity:0;transform:translateX(20px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes toastOut{from{opacity:1;transform:none}to{opacity:0;transform:translateX(20px) scale(.96)}}
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:9000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface);
+  border:1px solid var(--glass-border);
+  border-radius:12px;
+  padding:10px 14px;
+  box-shadow:0 8px 32px rgba(0,0,0,.22),0 2px 8px rgba(0,0,0,.14);
+  backdrop-filter:blur(20px) saturate(1.6);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);
+  font-size:12px;font-weight:500;color:var(--t1);
+  min-width:220px;max-width:320px;
+  animation:toastIn .3s cubic-bezier(.34,1.56,.64,1) both;
+  pointer-events:all;
+}
+.toast.out{animation:toastOut .25s ease forwards}
+.toast-icon{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.toast.saved .toast-icon{background:var(--green-soft);color:var(--green)}
+.toast.info  .toast-icon{background:var(--accent-soft);color:var(--accent)}
+.toast.warn  .toast-icon{background:var(--amber-soft);color:var(--amber)}
+.toast.error .toast-icon{background:var(--red-soft);color:var(--red)}
+.toast-msg{flex:1;line-height:1.4}
+.toast-sub{font-size:10px;color:var(--t3);margin-top:1px}
+
+/* ── Git notice banner ── */
+.git-notice{background:var(--amber-soft);border:1px solid var(--amber);border-radius:8px;padding:8px 11px;font-size:11px;color:var(--amber);line-height:1.5;margin-top:4px}
+</style>
+<style>
+/* ── Modals ── */
+.modal-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal-card{background:var(--surface);border:1px solid var(--divider);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.16);width:100%;max-width:520px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column}
-
-.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 22px 16px;border-bottom:1px solid var(--divider);flex-shrink:0}
-.modal-title{font-size:15px;font-weight:600;color:var(--t1)}
-.modal-close{background:var(--surface-2);border:1px solid var(--glass-border);border-radius:8px;color:var(--t2);font-size:16px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s ease}
+.modal-card{background:var(--surface);border:1px solid var(--divider);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.18);width:100%;max-width:520px;max-height:82vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--divider);flex-shrink:0}
+.modal-title{font-size:14px;font-weight:600;color:var(--t1)}
+.modal-close{background:var(--surface-2);border:1px solid var(--glass-border);border-radius:7px;color:var(--t2);font-size:15px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
 .modal-close:hover{background:var(--surface);color:var(--t1);border-color:var(--accent-mid)}
-.modal-body{padding:20px 22px;overflow-y:auto;flex:1}
-.modal-footer{padding:14px 22px;border-top:1px solid var(--divider);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0}
-
-/* user table */
+.modal-body{padding:18px 20px;overflow-y:auto;flex:1}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--divider);display:flex;gap:9px;justify-content:flex-end;flex-shrink:0}
 .user-table{width:100%;border-collapse:collapse}
-.user-table th{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);text-align:left;padding:8px 12px;border-bottom:1px solid var(--divider)}
-.user-table td{padding:10px 12px;font-size:12px;color:var(--t2);border-bottom:1px solid var(--divider);vertical-align:middle}
+.user-table th{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);text-align:left;padding:7px 11px;border-bottom:1px solid var(--divider)}
+.user-table td{padding:9px 11px;font-size:12px;color:var(--t2);border-bottom:1px solid var(--divider);vertical-align:middle}
 .user-table tr:last-child td{border-bottom:none}
 .user-table tr:hover td{background:var(--accent-soft)}
-.role-badge{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px}
-.role-badge.admin{background:var(--red-soft);color:var(--red);border:1px solid rgba(240,80,110,.2)}
-.role-badge.viewer{background:var(--blue-soft);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
-.role-badge.operator{background:var(--amber-soft);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
-.tbl-action{background:none;border:1px solid transparent;border-radius:6px;font-size:11px;color:var(--t3);cursor:pointer;padding:3px 8px;transition:all .15s ease}
+.role-badge{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:20px}
+.role-badge.admin{background:var(--red-soft);color:var(--red);border:1px solid rgba(248,81,73,.2)}
+.role-badge.viewer{background:var(--blue-soft);color:var(--blue);border:1px solid rgba(121,192,255,.2)}
+.role-badge.operator{background:var(--amber-soft);color:var(--amber);border:1px solid rgba(210,153,34,.2)}
+.tbl-action{background:none;border:1px solid transparent;border-radius:6px;font-size:11px;color:var(--t3);cursor:pointer;padding:3px 7px;transition:all .15s}
 .tbl-action:hover{background:var(--surface-2);border-color:var(--divider);color:var(--t1)}
 .tbl-action.del:hover{background:var(--red-soft);border-color:var(--red);color:var(--red)}
-.form-row{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
-.form-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t3)}
-.btn-primary{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:white;background:#0969da;border:1px solid #0969da;border-radius:6px;padding:9px 20px;cursor:pointer;transition:all .15s ease}
-.btn-primary:hover{background:#0860ca}
-.btn-secondary{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--t2);background:var(--surface-2);border:1px solid var(--glass-border);border-radius:6px;padding:9px 20px;cursor:pointer;transition:all .15s ease}
+.form-row{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.form-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--t3)}
+.btn-primary{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:white;background:var(--accent);border:1px solid var(--accent);border-radius:7px;padding:8px 18px;cursor:pointer;transition:all .15s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-secondary{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--t2);background:var(--surface-2);border:1px solid var(--glass-border);border-radius:7px;padding:8px 18px;cursor:pointer;transition:all .15s}
 .btn-secondary:hover{background:var(--surface-3);color:var(--t1)}
 
-/* ── Login screen ────────────────────────────────────────────────── */
-#login-screen{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--bg);background-image:var(--bg-mesh);background-attachment:fixed;transition:opacity .45s ease,transform .45s cubic-bezier(.22,1,.36,1)}
-#login-screen.hidden{opacity:0;pointer-events:none;transform:scale(1.04)}
-
-
-.login-card{background:var(--surface);border:1px solid var(--divider);box-shadow:0 4px 24px rgba(0,0,0,.10);border-radius:12px;padding:40px 36px 36px;width:100%;max-width:400px;position:relative;z-index:1}
-.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
-.login-logo-icon{width:40px;height:40px;filter:drop-shadow(0 4px 12px rgba(91,127,255,.4));animation:gentle-pulse 4s ease-in-out infinite}
-.login-logo-text{display:flex;flex-direction:column;gap:2px}
-.login-logo-name{font-size:18px;font-weight:600;color:var(--t1);line-height:1}
+/* ── Login ── */
+#login-screen{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity .4s,transform .4s cubic-bezier(.22,1,.36,1)}
+#login-screen.hidden{opacity:0;pointer-events:none;transform:scale(1.03)}
+.login-card{background:var(--surface);border:1px solid var(--divider);box-shadow:0 4px 24px rgba(0,0,0,.12);border-radius:14px;padding:38px 34px 34px;width:100%;max-width:390px}
+.login-logo{display:flex;align-items:center;gap:11px;margin-bottom:30px}
+.login-logo-icon{width:38px;height:38px;animation:gentle-pulse 4s ease-in-out infinite}
+.login-logo-name{font-size:17px;font-weight:600;color:var(--t1);line-height:1}
 .login-logo-sub{font-family:'Geist Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.06em;opacity:.8}
-.login-title{font-size:22px;font-weight:600;color:var(--t1);margin-bottom:6px;line-height:1.2}
-.login-subtitle{font-size:13px;color:var(--t3);margin-bottom:32px}
-.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.login-field label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3)}
-.login-field input{width:100%;background:var(--surface-2);border:1px solid var(--divider);border-radius:6px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:14px;padding:10px 14px;cursor:text;transition:all .2s ease;appearance:none;outline:none}
+.login-title{font-size:21px;font-weight:600;color:var(--t1);margin-bottom:5px}
+.login-subtitle{font-size:13px;color:var(--t3);margin-bottom:28px}
+.login-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.login-field label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t3)}
+.login-field input{background:var(--surface-2);border:1px solid var(--divider);border-radius:7px;color:var(--t1);font-size:14px;padding:10px 13px;outline:none;transition:all .2s;appearance:none}
 .login-field input::placeholder{color:var(--t4)}
 .login-field input:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-soft)}
 .login-field input.error{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
-.login-error{font-size:12px;color:var(--red);background:var(--red-soft);border:1px solid rgba(240,80,110,.2);border-radius:10px;padding:9px 14px;margin-bottom:16px;display:none;animation:popIn .25s cubic-bezier(.34,1.56,.64,1)}
+.login-error{font-size:12px;color:var(--red);background:var(--red-soft);border:1px solid rgba(248,81,73,.2);border-radius:9px;padding:8px 13px;margin-bottom:14px;display:none;animation:popIn .25s cubic-bezier(.34,1.56,.64,1)}
 .login-error.show{display:block}
-.login-options{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;margin-top:-4px}
-.login-remember{display:flex;align-items:center;gap:7px;cursor:pointer}
-.login-remember input[type="checkbox"]{width:15px;height:15px;border-radius:4px;padding:0;cursor:pointer;accent-color:var(--accent)}
+.login-options{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;margin-top:-4px}
+.login-remember{display:flex;align-items:center;gap:6px;cursor:pointer}
+.login-remember input[type="checkbox"]{width:14px;height:14px;border-radius:4px;padding:0;cursor:pointer;accent-color:var(--accent)}
 .login-remember span{font-size:12px;color:var(--t2)}
-.login-forgot{font-size:12px;color:var(--accent);cursor:pointer;text-decoration:none;transition:opacity .2s ease}
+.login-forgot{font-size:12px;color:var(--accent);cursor:pointer;text-decoration:none;transition:opacity .2s}
 .login-forgot:hover{opacity:.7}
-.login-btn{width:100%;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:white;background:#0969da;border:1px solid #0969da;border-radius:6px;padding:13px;cursor:pointer;transition:all .15s ease;position:relative;overflow:hidden}
-.login-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15) 0%,transparent 60%);pointer-events:none}
-.login-btn:hover{background:#0860ca}
-.login-btn:active{background:#0757ba}
-.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
-.login-divider{display:flex;align-items:center;gap:12px;margin:20px 0}
-.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--divider)}
-.login-divider span{font-size:11px;color:var(--t4);white-space:nowrap}
-.login-sso-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--t2);background:var(--surface-2);backdrop-filter:blur(8px);border:1px solid var(--glass-border);border-radius:14px;padding:11px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
-.login-sso-btn:hover{background:var(--surface);border-color:var(--accent-mid);color:var(--t1);transform:translateY(-1px);box-shadow:var(--glass-hover)}
-.login-sso-icon{width:18px;height:18px;flex-shrink:0}
-.login-footer{margin-top:28px;text-align:center;font-size:11px;color:var(--t4)}
+.login-btn{width:100%;font-size:14px;font-weight:600;color:white;background:var(--accent);border:none;border-radius:7px;padding:12px;cursor:pointer;transition:all .15s}
+.login-btn:hover{filter:brightness(1.1)}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-footer{margin-top:24px;text-align:center;font-size:11px;color:var(--t4)}
 </style>
-
-<script>
-(function () {
-  const theme = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-theme', theme);
-})();
-</script>
-
+<script>(function(){const t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);})()</script>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════════════════════
-     LOGIN SCREEN
-     ════════════════════════════════════════════════════════════ -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">
       <div class="login-logo-icon">
-        <svg viewBox="0 0 40 40" fill="none">
-          <path d="M20 3L36 12.5V27.5L20 37L4 27.5V12.5L20 3Z" stroke="var(--accent)" stroke-width="1.8" fill="var(--accent-soft)"/>
-          <circle cx="20" cy="20" r="4" fill="var(--accent)" opacity=".9"/>
-          <line x1="20" y1="7" x2="20" y2="16" stroke="var(--accent)" stroke-width="1.4" opacity=".55"/>
-          <line x1="20" y1="24" x2="20" y2="33" stroke="var(--accent)" stroke-width="1.4" opacity=".55"/>
-          <line x1="30.5" y1="14" x2="23.5" y2="18" stroke="var(--accent)" stroke-width="1.4" opacity=".55"/>
-          <line x1="16.5" y1="22" x2="9.5" y2="26" stroke="var(--accent)" stroke-width="1.4" opacity=".55"/>
-          <line x1="9.5" y1="14" x2="16.5" y2="18" stroke="var(--accent)" stroke-width="1.4" opacity=".55"/>
-          <line x1="23.5" y1="22" x2="30.5" y2="26" stroke="var(--accent)" stroke-width="1.4" opacity=".55"/>
+        <svg viewBox="0 0 38 38" fill="none">
+          <path d="M19 2L34 10.5V27.5L19 36L4 27.5V10.5L19 2Z" stroke="var(--accent)" stroke-width="1.6" fill="var(--accent-soft)"/>
+          <circle cx="19" cy="19" r="3.2" fill="var(--accent)" opacity=".9"/>
+          <line x1="19" y1="6" x2="19" y2="15.8" stroke="var(--accent)" stroke-width="1.2" opacity=".55"/>
+          <line x1="19" y1="22.2" x2="19" y2="32" stroke="var(--accent)" stroke-width="1.2" opacity=".55"/>
+          <line x1="28.5" y1="11" x2="22.2" y2="14.8" stroke="var(--accent)" stroke-width="1.2" opacity=".55"/>
+          <line x1="15.8" y1="23.2" x2="9.5" y2="27" stroke="var(--accent)" stroke-width="1.2" opacity=".55"/>
+          <line x1="9.5" y1="11" x2="15.8" y2="14.8" stroke="var(--accent)" stroke-width="1.2" opacity=".55"/>
+          <line x1="22.2" y1="23.2" x2="28.5" y2="27" stroke="var(--accent)" stroke-width="1.2" opacity=".55"/>
         </svg>
       </div>
-      <div class="login-logo-text">
+      <div>
         <div class="login-logo-name">K8s Linter</div>
         <div class="login-logo-sub">v2.1 · agentic</div>
       </div>
@@ -417,66 +443,41 @@ select:focus, input:focus {
     </div>
     <div class="login-options">
       <label class="login-remember"><input type="checkbox" id="login-remember"/><span>Remember me</span></label>
-      <a class="login-forgot" onclick="Auth.showLoginError('Password reset not configured. Contact your administrator.')">Forgot password?</a>
+      <a class="login-forgot" onclick="Auth.showLoginError('Password reset not configured.')">Forgot password?</a>
     </div>
-    <button class="login-btn" id="login-btn" type="button">
-      <span id="login-btn-label">Sign in</span>
-    </button>
-    <div class="login-divider"><span>or continue with</span></div>
-    <button class="login-sso-btn" onclick="Auth.showLoginError('SSO not configured. Use username/password.')">
-      <svg class="login-sso-icon" viewBox="0 0 18 18" fill="none">
-        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
-        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
-        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-      </svg>
-      Sign in with Google
-    </button>
+    <button class="login-btn" id="login-btn" type="button"><span id="login-btn-label">Sign in</span></button>
     <div class="login-footer">Protected environment · <a href="#" style="color:var(--accent);text-decoration:none">Need access?</a></div>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════════════
-     USER MANAGEMENT MODAL
-     ════════════════════════════════════════════════════════════ -->
+<!-- USER MANAGEMENT MODAL -->
 <div class="modal-overlay" id="modal-users">
   <div class="modal-card" style="max-width:560px">
-    <div class="modal-header">
-      <div class="modal-title">User Management</div>
-      <button class="modal-close" onclick="closeModal('modal-users')">×</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">User Management</div><button class="modal-close" onclick="closeModal('modal-users')">×</button></div>
     <div class="modal-body">
-      <div style="background:var(--surface-2);border:1px solid var(--glass-border);border-radius:14px;padding:16px;margin-bottom:18px">
-        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:12px">Add New User</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="background:var(--surface-2);border:1px solid var(--glass-border);border-radius:12px;padding:14px;margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:11px">Add New User</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px">
           <div class="form-row" style="margin:0"><div class="form-label">Username</div><input type="text" id="new-user-name" placeholder="username"></div>
           <div class="form-row" style="margin:0"><div class="form-label">Password</div><input type="password" id="new-user-pass" placeholder="password"></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
-          <div class="form-row" style="margin:0">
-            <div class="form-label">Role</div>
-            <select id="new-user-role"><option value="admin">Admin</option><option value="operator">Operator</option><option value="viewer" selected>Viewer</option></select>
-          </div>
-          <button class="btn-primary" onclick="handleAddUser()" style="white-space:nowrap;height:38px">Add User</button>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end">
+          <div class="form-row" style="margin:0"><div class="form-label">Role</div><select id="new-user-role"><option value="admin">Admin</option><option value="operator">Operator</option><option value="viewer" selected>Viewer</option></select></div>
+          <button class="btn-primary" onclick="handleAddUser()" style="white-space:nowrap;height:36px">Add User</button>
         </div>
-        <div id="add-user-error" style="font-size:11px;color:var(--red);margin-top:8px;display:none"></div>
+        <div id="add-user-error" style="font-size:11px;color:var(--red);margin-top:7px;display:none"></div>
       </div>
       <table class="user-table"><thead><tr><th>Username</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="user-table-body"></tbody></table>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════════════
-     AI TOKENS MODAL
-     ════════════════════════════════════════════════════════════ -->
+<!-- AI TOKENS MODAL -->
 <div class="modal-overlay" id="modal-tokens">
   <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title">AI Provider API Keys</div>
-      <button class="modal-close" onclick="closeModal('modal-tokens')">×</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">AI Provider API Keys</div><button class="modal-close" onclick="closeModal('modal-tokens')">×</button></div>
     <div class="modal-body">
-      <div style="font-size:12px;color:var(--t3);margin-bottom:16px;line-height:1.7">Keys are stored in your browser's localStorage and sent to the backend only when AI remediation is enabled. They are never logged server-side.</div>
+      <div style="font-size:12px;color:var(--t3);margin-bottom:14px;line-height:1.7">Keys are stored in your browser's localStorage and sent to the backend only when AI remediation is enabled.</div>
       <div class="provider-tabs" id="provider-tabs">
         <div class="ptab active" data-p="openai" onclick="Tokens.setProviderTab('openai')">OpenAI</div>
         <div class="ptab" data-p="anthropic" onclick="Tokens.setProviderTab('anthropic')">Anthropic</div>
@@ -486,11 +487,11 @@ select:focus, input:focus {
       <div id="tok-openai">
         <div class="form-row"><div class="form-label">OpenAI API Key</div><div class="token-field"><input type="password" id="tok-openai-key" placeholder="sk-..."><button class="token-eye" onclick="Tokens.toggleTokenVisibility('tok-openai-key')">👁</button></div></div>
         <div class="form-row"><div class="form-label">Organization ID (optional)</div><input type="text" id="tok-openai-org" placeholder="org-..."></div>
-        <div class="form-row"><div class="form-label">Default Model</div><select id="tok-openai-model"><option value="gpt-4o">gpt-4o</option><option value="gpt-4o-mini">gpt-4o-mini</option><option value="gpt-4-turbo">gpt-4-turbo</option><option value="gpt-3.5-turbo">gpt-3.5-turbo</option></select></div>
+        <div class="form-row"><div class="form-label">Default Model</div><select id="tok-openai-model"><option value="gpt-4o">gpt-4o</option><option value="gpt-4o-mini">gpt-4o-mini</option><option value="gpt-4-turbo">gpt-4-turbo</option></select></div>
       </div>
       <div id="tok-anthropic" style="display:none">
         <div class="form-row"><div class="form-label">Anthropic API Key</div><div class="token-field"><input type="password" id="tok-anthropic-key" placeholder="sk-ant-..."><button class="token-eye" onclick="Tokens.toggleTokenVisibility('tok-anthropic-key')">👁</button></div></div>
-        <div class="form-row"><div class="form-label">Default Model</div><select id="tok-anthropic-model"><option value="claude-sonnet-4-20250514">claude-sonnet-4-20250514</option><option value="claude-haiku-4-5-20251001">claude-haiku-4-5</option></select></div>
+        <div class="form-row"><div class="form-label">Default Model</div><select id="tok-anthropic-model"><option value="claude-sonnet-4-20250514">claude-sonnet-4</option><option value="claude-haiku-4-5-20251001">claude-haiku-4-5</option></select></div>
       </div>
       <div id="tok-azure" style="display:none">
         <div class="form-row"><div class="form-label">Azure API Key</div><div class="token-field"><input type="password" id="tok-azure-key" placeholder="Azure key..."><button class="token-eye" onclick="Tokens.toggleTokenVisibility('tok-azure-key')">👁</button></div></div>
@@ -511,15 +512,13 @@ select:focus, input:focus {
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════════════
-     MAIN APP
-     ════════════════════════════════════════════════════════════ -->
+<!-- MAIN APP -->
 <div class="app" id="main-app" style="display:none">
 
-  <!-- Top bar -->
-  <div class="score-strip">
-    <div class="score-brand">
-      <div class="hex-icon">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
         <svg viewBox="0 0 28 28" fill="none">
           <path d="M14 2L25 8.5V19.5L14 26L3 19.5V8.5L14 2Z" stroke="var(--accent)" stroke-width="1.3" fill="var(--accent-soft)"/>
           <circle cx="14" cy="14" r="2.8" fill="var(--accent)" opacity=".85"/>
@@ -531,134 +530,166 @@ select:focus, input:focus {
           <line x1="16.7" y1="15.8" x2="21.3" y2="18.5" stroke="var(--accent)" stroke-width="1" opacity=".6"/>
         </svg>
       </div>
-      <div class="brand-text-wrap">
-        <div class="brand-name">K8s Linter</div>
-        <div class="brand-ver">v2.1 · agentic</div>
-      </div>
+      <div><div class="brand-name">K8s Linter</div><div class="brand-ver">v2.1 · agentic</div></div>
     </div>
-
-    <div class="score-metrics">
-      <div class="score-metric"><div class="sm-label">Env</div><div class="sm-val" id="sc-env" style="font-size:12px">—</div></div>
-      <div class="score-metric"><div class="sm-label">Score</div><div class="sm-val cyan" id="sc-score">—</div></div>
-      <div class="score-metric"><div class="sm-label">Grade</div><div class="sm-val cyan" id="sc-grade">—</div></div>
-      <div class="score-metric"><div class="sm-label">Pass</div><div class="sm-val green" id="sc-pass">—</div></div>
-      <div class="score-metric"><div class="sm-label">Fail</div><div class="sm-val red" id="sc-fail">—</div></div>
-      <div class="score-metric"><div class="sm-label">Warn</div><div class="sm-val amber" id="sc-warn">—</div></div>
-      <div class="score-metric"><div class="sm-label">Res</div><div class="sm-val" id="sc-resources" style="color:var(--t2)">—</div></div>
+    <div class="metrics">
+      <div class="metric"><div class="m-lbl">Env</div><div class="m-val" id="sc-env" style="font-size:11px">—</div></div>
+      <div class="metric"><div class="m-lbl">Score</div><div class="m-val cyan" id="sc-score">—</div></div>
+      <div class="metric"><div class="m-lbl">Grade</div><div class="m-val cyan" id="sc-grade">—</div></div>
+      <div class="metric"><div class="m-lbl">Pass</div><div class="m-val green" id="sc-pass">—</div></div>
+      <div class="metric"><div class="m-lbl">Fail</div><div class="m-val red" id="sc-fail">—</div></div>
+      <div class="metric"><div class="m-lbl">Warn</div><div class="m-val amber" id="sc-warn">—</div></div>
+      <div class="metric"><div class="m-lbl">Res</div><div class="m-val" id="sc-resources" style="color:var(--t2)">—</div></div>
     </div>
-
-    <div class="score-actions">
-      <div class="server-stat">
-        <div class="dot" id="srv-dot"></div>
-        <span id="srv-txt" style="font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.06em">offline</span>
-      </div>
-      <div class="ollama-badge" id="provider-badge">
-       <div class="o-dot"></div>
-       <span id="provider-name">ollama</span>
-      </div>
+    <div class="topbar-actions">
+      <div class="srv-stat"><div class="dot" id="srv-dot"></div><span id="srv-txt">offline</span></div>
+      <div class="provider-badge" id="provider-badge"><div class="o-dot"></div><span id="provider-name">ollama</span></div>
       <button class="theme-btn" onclick="toggleTheme()">
         <div class="theme-track"><div class="theme-knob"></div></div>
-        <span class="theme-label" id="theme-lbl">Light</span>
+        <span class="theme-lbl" id="theme-lbl">Dark</span>
       </button>
       <button class="stop-btn" id="stop-btn" onclick="Audit.stopAudit()">
-        <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="currentColor" rx="1"/></svg>
-        Stop
+        <svg width="9" height="9" viewBox="0 0 9 9"><rect x="1" y="1" width="7" height="7" fill="currentColor" rx="1"/></svg>Stop
       </button>
-      <button class="run-btn" id="run-btn" onclick="Audit.runLint()">
-        <span id="btn-inner">&#9654;&nbsp; Run Audit</span>
-      </button>
-
-      <!-- User avatar — NOTE: explicit hex gradient, no CSS var dependency -->
+      <button class="run-btn" id="run-btn" onclick="Audit.runLint()"><span id="btn-inner">▶ Run Audit</span></button>
       <div class="user-menu-wrap" id="user-menu-wrap">
         <div class="user-avatar" id="user-avatar" onclick="toggleUserMenu(event)">?</div>
         <div class="user-dropdown" id="user-dropdown">
-          <div class="ud-header">
-            <div class="ud-name" id="ud-name">—</div>
-            <div class="ud-role" id="ud-role">—</div>
-          </div>
-          <div class="ud-item" onclick="openTokensModal()">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="5" width="12" height="8" rx="1.5"/><path d="M4 5V3.5a3 3 0 016 0V5"/><circle cx="7" cy="9" r="1"/></svg>
-            AI API Keys
-          </div>
-          <div class="ud-item" id="ud-manage-users" style="display:none" onclick="openUsersModal()">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="2.5"/><path d="M1 12c0-2.2 1.8-4 4-4s4 1.8 4 4"/><line x1="11" y1="6" x2="11" y2="10" stroke-linecap="round"/><line x1="9" y1="8" x2="13" y2="8" stroke-linecap="round"/></svg>
-            Manage Users
-          </div>
+          <div class="ud-header"><div class="ud-name" id="ud-name">—</div><div class="ud-role" id="ud-role">—</div></div>
+          <div class="ud-item" onclick="openTokensModal()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="5" width="12" height="8" rx="1.5"/><path d="M4 5V3.5a3 3 0 016 0V5"/><circle cx="7" cy="9" r="1"/></svg>AI API Keys</div>
+          <div class="ud-item" id="ud-manage-users" style="display:none" onclick="openUsersModal()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="2.5"/><path d="M1 12c0-2.2 1.8-4 4-4s4 1.8 4 4"/><line x1="11" y1="6" x2="11" y2="10" stroke-linecap="round"/><line x1="9" y1="8" x2="13" y2="8" stroke-linecap="round"/></svg>Manage Users</div>
           <div class="ud-divider"></div>
-          <div class="ud-item danger" onclick="handleLogout()">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2H2.5A1.5 1.5 0 001 3.5v7A1.5 1.5 0 002.5 12H5M9 10l3-3-3-3M12 7H5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Sign Out
-          </div>
+          <div class="ud-item danger" onclick="handleLogout()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2H2.5A1.5 1.5 0 001 3.5v7A1.5 1.5 0 002.5 12H5M9 10l3-3-3-3M12 7H5" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign Out</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Sidebar -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="ctrl-grp">
-      <div class="sec-lbl">Environment</div>
-      <div class="env-pills">
-        <div class="env-pill active-prod" id="pill-prod" onclick="UI.setEnv('production')">Prod</div>
-        <div class="env-pill" id="pill-stage" onclick="UI.setEnv('staging')">Stage</div>
-        <div class="env-pill" id="pill-dev" onclick="UI.setEnv('development')">Dev</div>
+    <div class="sidebar-inner">
+
+      <!-- Environment -->
+      <div class="ctrl-grp">
+        <div class="sec-lbl">Environment</div>
+        <div class="env-pills">
+          <div class="env-pill active-prod" id="pill-prod" onclick="UI.setEnv('production')">Prod</div>
+          <div class="env-pill" id="pill-stage" onclick="UI.setEnv('staging')">Stage</div>
+          <div class="env-pill" id="pill-dev" onclick="UI.setEnv('development')">Dev</div>
+        </div>
+        <div style="font-size:12px;color:var(--t3);margin-top:2px">Each environment keeps its own audit results.</div>
       </div>
-      <div style="font-size:12px;color:var(--t3);margin-top:2px">Each environment keeps its own audit results.</div>
-    </div>
-    <div class="ctrl-grp">
-      <div class="sec-lbl">Namespace</div>
-      <select id="ns-select"><option value="default">default</option></select>
-    </div>
-    <div class="ctrl-grp">
-      <div class="sec-lbl">Profile</div>
-      <select id="profile-select">
-        <option value="custom">Custom</option>
-        <option value="cis-benchmark">CIS Benchmark</option>
-        <option value="nsa-hardening">NSA Hardening</option>
-      </select>
-    </div>
-    <div class="divider"></div>
-    <div class="ctrl-grp">
-      <div class="sec-lbl">Ollama Config</div>
-      <div><div class="fld-lbl">Server URL</div><input type="text" id="ollama-url" value="http://localhost:11434" placeholder="http://host:11434"></div>
-      <div><div class="fld-lbl">Model</div>
-        <div class="model-row">
-          <select id="model-select" style="flex:1"><option value="llama3">llama3</option><option value="llama3:8b">llama3:8b</option><option value="mistral">mistral</option><option value="codellama">codellama</option></select>
-          <button class="ref-btn" onclick="Audit.loadModels()" title="Fetch models from Ollama">&#8635;</button>
+
+      <div class="divider-line"></div>
+
+      <!-- Source -->
+      <div class="ctrl-grp">
+        <div class="sec-lbl">Source</div>
+        <div class="src-tabs">
+          <button class="src-tab active" id="src-tab-cluster" onclick="setSourceTab('cluster')">Cluster</button>
+          <button class="src-tab" id="src-tab-manifest" onclick="setSourceTab('manifest')">Manifest</button>
+          <button class="src-tab" id="src-tab-github" onclick="setSourceTab('github')">GitHub</button>
+        </div>
+
+        <!-- Cluster panel -->
+        <div class="src-panel active" id="src-panel-cluster">
+          <div><div class="fld-lbl">Namespace</div><select id="ns-select" onchange="onSidebarChange(this,'Namespace updated')"><option value="default">default</option></select></div>
+        </div>
+
+        <!-- Manifest panel -->
+        <div class="src-panel" id="src-panel-manifest">
+          <div><div class="fld-lbl">Manifest Path</div><input type="text" id="manifest-path" value="./manifests" placeholder="./manifests" oninput="onSidebarChange(this,'Manifest path updated')"></div>div>
+        </div>
+
+        <!-- GitHub panel -->
+        <div class="src-panel" id="src-panel-github">
+          <div class="git-cfg">
+            <div class="git-cfg-title">
+              <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              Git Configuration
+            </div>
+            <div><div class="fld-lbl">Repository URL</div><input type="url" id="git-repo-url" placeholder="https://github.com/org/repo" oninput="onSidebarChange(this,'Repo URL updated')"></div>
+            <div><div class="fld-lbl">Branch</div><input type="text" id="git-branch" value="main" placeholder="main" oninput="onSidebarChange(this,'Branch updated')"></div>
+            <div><div class="fld-lbl">Path in Repo</div><input type="text" id="git-path" value="/" placeholder="/k8s or /manifests" oninput="onSidebarChange(this,'Path updated')"></div>
+            <div><div class="fld-lbl">Access Token (PAT)</div>
+              <div class="token-field">
+                <input type="password" id="git-token" placeholder="ghp_..." oninput="onSidebarChange(this,'Token saved')">
+                <button class="token-eye" onclick="toggleGitToken()">👁</button>
+              </div>
+            </div>
+            <div><div class="fld-lbl">Username (optional)</div><input type="text" id="git-username" placeholder="git username" oninput="onSidebarChange(this,'Username updated')"></div>
+          </div>
+          <div class="git-notice">
+            ⚠ The backend clones via <code style="font-family:'Geist Mono',monospace;font-size:10px">manifest_path</code>. Ensure the server has git access to the repo, or pre-clone to a local path and use the Manifest source instead.
+          </div>
         </div>
       </div>
-      <div><div class="fld-lbl">API Base</div><input type="text" id="api-base" value="http://localhost:8000" placeholder="http://localhost:8000"></div>
-    </div>
-    <div class="ctrl-grp">
-      <div class="sec-lbl">AI Provider</div>
-      <select id="ai-provider-select">
-        <option value="ollama">Ollama (local)</option>
-        <option value="openai">OpenAI</option>
-        <option value="anthropic">Anthropic</option>
-        <option value="azure">Azure OpenAI</option>
-        <option value="custom">Custom / OSS</option>
-      </select>
-      <button style="width:100%;margin-top:6px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-mid);border-radius:10px;padding:7px;cursor:pointer;transition:all .2s ease" onclick="openTokensModal()">
-        &#128273;&nbsp; Configure API Keys
-      </button>
-    </div>
-    <div class="ctrl-grp">
-      <div class="sec-lbl">Options</div>
-      <div class="toggle-row">
-        <div class="toggle-lbl">AI Remediation</div>
-        <div class="toggle on" id="toggle-ai" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+
+      <div class="divider-line"></div>
+
+      <!-- Profile -->
+      <div class="ctrl-grp">
+        <div class="sec-lbl">Profile</div>
+        <select id="profile-select">
+          <option value="custom">Custom</option>
+          <option value="cis-benchmark">CIS Benchmark</option>
+          <option value="nsa-hardening">NSA Hardening</option>
+        </select>
       </div>
-      <div class="toggle-row" style="border:none">
-        <div class="toggle-lbl">Severity Gate</div>
-        <select id="gate-select" style="width:auto;font-size:10px;padding:4px 7px;border-radius:8px"><option value="high">High</option><option value="critical">Critical</option><option value="medium">Medium</option></select>
+
+      <div class="divider-line"></div>
+
+      <!-- Ollama Config -->
+      <div class="ctrl-grp">
+        <div class="sec-lbl">Ollama Config</div>
+        <div><div class="fld-lbl">Server URL</div><input type="text" id="ollama-url" value="http://localhost:11434" placeholder="http://host:11434" oninput="onSidebarChange(this,'Ollama URL updated')"></div>
+        <div><div class="fld-lbl">Model</div>
+          <div class="model-row">
+            <select id="model-select" style="flex:1"><option value="llama3">llama3</option><option value="llama3:8b">llama3:8b</option><option value="mistral">mistral</option><option value="codellama">codellama</option></select>
+            <button class="ref-btn" onclick="Audit.loadModels()" title="Fetch models">&#8635;</button>
+          </div>
+        </div>
+        <div><div class="fld-lbl">API Base</div><input type="text" id="api-base" value="http://localhost:8000" placeholder="http://localhost:8000" oninput="onSidebarChange(this,'API base updated')"></div>
       </div>
-    </div>
+
+      <div class="divider-line"></div>
+
+      <!-- AI Provider -->
+      <div class="ctrl-grp">
+        <div class="sec-lbl">AI Provider</div>
+        <select id="ai-provider-select">
+          <option value="ollama">Ollama (local)</option>
+          <option value="openai">OpenAI</option>
+          <option value="anthropic">Anthropic</option>
+          <option value="azure">Azure OpenAI</option>
+          <option value="custom">Custom / OSS</option>
+        </select>
+        <button style="width:100%;margin-top:5px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-mid);border-radius:8px;padding:7px;cursor:pointer;transition:all .2s" onclick="openTokensModal()">🔑 Configure API Keys</button>
+      </div>
+
+      <div class="divider-line"></div>
+
+      <!-- Options -->
+      <div class="ctrl-grp">
+        <div class="sec-lbl">Options</div>
+        <div class="toggle-row">
+          <div class="toggle-lbl">AI Remediation</div>
+          <div class="toggle on" id="toggle-ai" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="toggle-row" style="border:none">
+          <div class="toggle-lbl">Severity Gate</div>
+          <select id="gate-select" style="width:auto;font-size:11px;padding:4px 7px;border-radius:7px"><option value="high">High</option><option value="critical">Critical</option><option value="medium">Medium</option></select>
+        </div>
+      </div>
+
+    </div><!-- /sidebar-inner -->
   </aside>
 
-  <!-- Main content -->
+  <!-- MAIN -->
   <main class="main">
+    <!-- Log -->
     <div class="log-header">
-      <span class="log-header-title">Live audit log</span>
+      <span class="log-header-title">Live Audit Log</span>
       <button class="log-clear-btn" onclick="document.getElementById('log-area').innerHTML=''">Clear</button>
     </div>
     <div class="log-area" id="log-area">
@@ -671,39 +702,138 @@ select:focus, input:focus {
     </div>
     <div class="notice-area">
       <div class="gate-bar" id="gate-bar"></div>
-      <div class="ai-bar" id="ai-bar"><div class="ai-bar-lbl">AI executive summary</div><div id="ai-text"></div></div>
+      <div class="ai-bar" id="ai-bar"><div class="ai-bar-lbl">AI Executive Summary</div><div id="ai-text"></div></div>
     </div>
-    <div class="tabs-row">
-      <div class="tabs">
-        <div class="tab active" data-tab="all"         onclick="UI.setTab('all')">All</div>
-        <div class="tab" data-tab="security"     onclick="UI.setTab('security')">Security</div>
-        <div class="tab" data-tab="reliability"  onclick="UI.setTab('reliability')">Reliability</div>
-        <div class="tab" data-tab="networking"   onclick="UI.setTab('networking')">Networking</div>
-        <div class="tab" data-tab="rbac"         onclick="UI.setTab('rbac')">RBAC</div>
-        <div class="tab" data-tab="resource"     onclick="UI.setTab('resource')">Resources</div>
+
+    <!-- View tabs -->
+    <div class="view-tabs-row">
+      <div class="view-tabs">
+        <div class="view-tab active" data-view="charts" onclick="setView('charts')">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="7" width="3" height="6" rx=".5"/><rect x="5.5" y="4" width="3" height="9" rx=".5"/><rect x="10" y="1" width="3" height="12" rx=".5"/></svg>
+          Charts
+        </div>
+        <div class="view-tab" data-view="findings" onclick="setView('findings')">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h10M2 7h7M2 11h5"/></svg>
+          Findings
+        </div>
       </div>
-      <div class="filters">
-        <div class="fchip active" data-f="all"  onclick="UI.setFilter('all')">All</div>
+    </div>
+
+    <!-- Category sub-row (only shown in Findings view) -->
+    <div class="cat-tabs-row" id="cat-tabs-row">
+      <div class="cat-tabs" id="cat-tabs">
+        <div class="tab active" data-tab="all" onclick="UI.setTab('all')">All</div>
+        <div class="tab" data-tab="security" onclick="UI.setTab('security')">Security</div>
+        <div class="tab" data-tab="reliability" onclick="UI.setTab('reliability')">Reliability</div>
+        <div class="tab" data-tab="networking" onclick="UI.setTab('networking')">Networking</div>
+        <div class="tab" data-tab="rbac" onclick="UI.setTab('rbac')">RBAC</div>
+        <div class="tab" data-tab="resource" onclick="UI.setTab('resource')">Resources</div>
+      </div>
+      <div class="filters" id="findings-filters">
+        <div class="fchip active" data-f="all" onclick="UI.setFilter('all')">All</div>
         <div class="fchip" data-f="fail" onclick="UI.setFilter('fail')">Fail</div>
         <div class="fchip" data-f="pass" onclick="UI.setFilter('pass')">Pass</div>
         <div class="fchip" data-f="warn" onclick="UI.setFilter('warn')">Warn</div>
       </div>
     </div>
-    <div class="results" id="results">
-      <div class="empty-state">
-        <div class="empty-glyph">&#9671;</div>
-        <div>No audit data yet.</div>
-        <div>Press <strong>Run Audit</strong> to begin.</div>
-      </div>
-    </div>
-  </main>
-</div>
 
-<!-- ════════════════════════════════════════════════════════════
-     SCRIPTS — external modules served via /frontend/js/
-     ════════════════════════════════════════════════════════════ -->
+    <!-- Content -->
+    <div class="content-area">
+      <!-- Charts view -->
+      <div class="view-panel active" id="view-charts">
+        <div class="charts-grid">
+          <!-- Score ring -->
+          <div class="chart-card" style="grid-column:span 1">
+            <div class="chart-title">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 2"/></svg>
+              Overall Score
+            </div>
+            <div class="chart-wrap" style="height:200px">
+              <div class="score-ring-wrap">
+                <div class="score-ring">
+                  <svg width="130" height="130" viewBox="0 0 100 100">
+                    <circle class="score-ring-bg" cx="50" cy="50" r="45"/>
+                    <circle class="score-ring-fill" id="score-ring-fill" cx="50" cy="50" r="45"/>
+                  </svg>
+                  <div class="score-ring-text">
+                    <div class="score-ring-pct" id="ring-pct">—</div>
+                    <div class="score-ring-grade" id="ring-grade">—</div>
+                  </div>
+                </div>
+                <div class="score-stats">
+                  <div class="score-stat"><div class="score-stat-val green" id="stat-pass" style="color:var(--green)">0</div><div class="score-stat-lbl">Pass</div></div>
+                  <div class="score-stat"><div class="score-stat-val" id="stat-fail" style="color:var(--red)">0</div><div class="score-stat-lbl">Fail</div></div>
+                  <div class="score-stat"><div class="score-stat-val" id="stat-warn" style="color:var(--amber)">0</div><div class="score-stat-lbl">Warn</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Severity breakdown -->
+          <div class="chart-card">
+            <div class="chart-title">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2L13 12H1L7 2z"/><line x1="7" y1="6" x2="7" y2="9"/><circle cx="7" cy="11" r=".5" fill="currentColor"/></svg>
+              Severity Breakdown
+            </div>
+            <div class="chart-wrap" style="height:auto;padding-top:4px">
+              <div class="sev-grid" id="sev-grid">
+                <div class="sev-card critical"><div class="sev-card-val" id="sev-critical">0</div><div class="sev-card-lbl">Critical</div></div>
+                <div class="sev-card high"><div class="sev-card-val" id="sev-high">0</div><div class="sev-card-lbl">High</div></div>
+                <div class="sev-card medium"><div class="sev-card-val" id="sev-medium">0</div><div class="sev-card-lbl">Medium</div></div>
+                <div class="sev-card low"><div class="sev-card-val" id="sev-low">0</div><div class="sev-card-lbl">Low</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category bar chart -->
+          <div class="chart-card" style="grid-column:span 2">
+            <div class="chart-title">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="7" width="3" height="6" rx=".5"/><rect x="5.5" y="4" width="3" height="9" rx=".5"/><rect x="10" y="1" width="3" height="12" rx=".5"/></svg>
+              Findings by Category
+            </div>
+            <div class="chart-wrap" style="height:auto">
+              <div class="bar-chart" id="cat-bar-chart" style="width:100%">
+                <div style="font-size:12px;color:var(--t4);text-align:center;padding:20px">Run an audit to see results</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pass/Fail donut -->
+          <div class="chart-card">
+            <div class="chart-title">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><circle cx="7" cy="7" r="2.5"/></svg>
+              Pass / Fail / Warn
+            </div>
+            <div class="chart-wrap"><canvas id="chart-donut"></canvas></div>
+          </div>
+
+          <!-- Severity radar -->
+          <div class="chart-card">
+            <div class="chart-title">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="7,1 13,5 13,9 7,13 1,9 1,5"/></svg>
+              Category Radar
+            </div>
+            <div class="chart-wrap"><canvas id="chart-radar"></canvas></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Findings view -->
+      <div class="view-panel" id="view-findings">
+        <div class="results" id="results">
+          <div class="empty-state">
+            <div class="empty-glyph">◇</div>
+            <div>No audit data yet.</div>
+            <div>Press <strong>Run Audit</strong> to begin.</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /content-area -->
+  </main>
+</div><!-- /app -->
+
 <script>
-/* Hoist __updateUserUI before auth.js so showApp() can call it during session restore */
 window.__updateUserUI = function() {
   if (!window.Auth) return;
   const u = window.Auth.getCurrentUser();
@@ -716,23 +846,9 @@ window.__updateUserUI = function() {
 </script>
 <script>
 // ===== auth.js =====
-/**
- * auth.js — Login / logout / session + user-store (localStorage-backed)
- *
- * Exports: initAuth, doLogin, doLogout, getCurrentUser
- * Reads from/writes to: k8s_linter_users, k8s_linter_session
- */
-
 'use strict';
-
-/* ── User store ─────────────────────────────────────────────────────── */
-
-function loadUsers() {
-  try { return JSON.parse(localStorage.getItem('k8s_linter_users') || 'null'); }
-  catch (e) { return null; }
-}
+function loadUsers() { try { return JSON.parse(localStorage.getItem('k8s_linter_users') || 'null'); } catch(e) { return null; } }
 function saveUsers(u) { localStorage.setItem('k8s_linter_users', JSON.stringify(u)); }
-
 function initUsers() {
   if (!loadUsers()) {
     saveUsers([
@@ -742,214 +858,96 @@ function initUsers() {
     ]);
   }
 }
-
-/* ── Current user (module-level) ────────────────────────────────────── */
 let _currentUser = null;
 function getCurrentUser() { return _currentUser; }
-
-/* ── Auth flow ──────────────────────────────────────────────────────── */
-
 function initAuth({ onSuccess } = {}) {
   initUsers();
   const remembered = localStorage.getItem('k8s_linter_session');
   if (remembered) {
     const u = (loadUsers() || []).find(x => x.username === remembered && x.active);
-    if (u) {
-      showApp(u);          // show the app and update UI
-      onSuccess && onSuccess(u);
-      return;
-    }
+    if (u) { showApp(u); onSuccess && onSuccess(u); return; }
   }
   _showLoginScreen();
 }
-
 function _showLoginScreen() {
-  document.getElementById('main-app').style.display   = 'none';
+  document.getElementById('main-app').style.display = 'none';
   const ls = document.getElementById('login-screen');
-  ls.style.display = 'flex';
-  ls.classList.remove('hidden');
+  ls.style.display = 'flex'; ls.classList.remove('hidden');
   setTimeout(() => document.getElementById('login-user')?.focus(), 400);
 }
-
 function showApp(user) {
   _currentUser = user;
   document.getElementById('main-app').style.display = 'grid';
   const ls = document.getElementById('login-screen');
   ls.classList.add('hidden');
   setTimeout(() => { ls.style.display = 'none'; }, 450);
-  // update avatar/role in the header
   window.__updateUserUI && window.__updateUserUI();
 }
-
 function doLogin() {
-  const user   = document.getElementById('login-user').value.trim();
-  const pass   = document.getElementById('login-pass').value;
-  const btn    = document.getElementById('login-btn');
-  const label  = document.getElementById('login-btn-label');
-  const uInput = document.getElementById('login-user');
-  const pInput = document.getElementById('login-pass');
-
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const btn  = document.getElementById('login-btn');
+  const label = document.getElementById('login-btn-label');
   if (!user || !pass) { showLoginError('Please enter your username and password.'); return; }
-
   btn.disabled = true;
   label.innerHTML = '<span class="spinner"></span>&nbsp; Signing in…';
   document.getElementById('login-error').classList.remove('show');
-  uInput.classList.remove('error');
-  pInput.classList.remove('error');
-
   setTimeout(() => {
     const found = (loadUsers() || []).find(x => x.username === user && x.password === pass && x.active);
     if (found) {
       label.innerHTML = '✓ Authenticated';
-      if (document.getElementById('login-remember')?.checked) {
-        localStorage.setItem('k8s_linter_session', user);
-      }
-      setTimeout(() => {
-        showApp(found);
-        window.__updateUserUI && window.__updateUserUI();
-        window.__onAuthSuccess && window.__onAuthSuccess();
-      }, 500);
+      localStorage.setItem('k8s_linter_session', user);
+      setTimeout(() => { showApp(found); window.__onAuthSuccess && window.__onAuthSuccess(); }, 500);
     } else {
-      btn.disabled = false;
-      label.textContent = 'Sign in';
-      uInput.classList.add('error');
-      pInput.classList.add('error');
-      pInput.value = '';
-      pInput.focus();
-      showLoginError('Incorrect username or password. Please try again.');
+      btn.disabled = false; label.textContent = 'Sign in';
+      document.getElementById('login-user').classList.add('error');
+      document.getElementById('login-pass').classList.add('error');
+      document.getElementById('login-pass').value = '';
+      showLoginError('Incorrect username or password.');
     }
-  }, 900);
+  }, 800);
 }
-
 function doLogout() {
-  localStorage.removeItem('k8s_linter_session');
-  _currentUser = null;
-  // Reset login form
-  const lbl = document.getElementById('login-btn-label');
-  if (lbl) lbl.textContent = 'Sign in';
-  const btn = document.getElementById('login-btn');
-  if (btn) btn.disabled = false;
-  const u = document.getElementById('login-user');
-  const p = document.getElementById('login-pass');
-  if (u) u.value = '';
-  if (p) p.value = '';
+  localStorage.removeItem('k8s_linter_session'); _currentUser = null;
+  const lbl = document.getElementById('login-btn-label'); if (lbl) lbl.textContent = 'Sign in';
+  const btn = document.getElementById('login-btn'); if (btn) btn.disabled = false;
+  const u = document.getElementById('login-user'); const p = document.getElementById('login-pass');
+  if (u) u.value = ''; if (p) p.value = '';
   document.getElementById('login-error')?.classList.remove('show');
   _showLoginScreen();
 }
-
-function showLoginError(msg) {
-  const el = document.getElementById('login-error');
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.add('show');
-}
-
-/* ── User management CRUD (localStorage) ───────────────────────────── */
-
+function showLoginError(msg) { const el = document.getElementById('login-error'); if (!el) return; el.textContent = msg; el.classList.add('show'); }
 function addUser(name, pass, role) {
   if (!name || !pass) return { ok: false, msg: 'Username and password required.' };
   const users = loadUsers() || [];
   if (users.find(u => u.username === name)) return { ok: false, msg: 'Username already exists.' };
-  users.push({ username: name, password: pass, role, active: true });
-  saveUsers(users);
-  return { ok: true };
+  users.push({ username: name, password: pass, role, active: true }); saveUsers(users); return { ok: true };
 }
-
-function deleteUser(username) {
-  const users = (loadUsers() || []).filter(u => u.username !== username);
-  saveUsers(users);
-}
-
-function toggleUserActive(username) {
-  const users = loadUsers() || [];
-  const u = users.find(x => x.username === username);
-  if (u) { u.active = !u.active; saveUsers(users); }
-}
-
+function deleteUser(username) { saveUsers((loadUsers() || []).filter(u => u.username !== username)); }
+function toggleUserActive(username) { const users = loadUsers() || []; const u = users.find(x => x.username === username); if (u) { u.active = !u.active; saveUsers(users); } }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function renderUserTable() {
-  const tbody = document.getElementById('user-table-body');
-  if (!tbody) return;
-  const users = loadUsers() || [];
-  const me    = _currentUser?.username;
-  tbody.innerHTML = users.map(u => `
-    <tr>
-      <td><span style="font-family:'Geist Mono',monospace;font-size:11px">${esc(u.username)}</span></td>
-      <td><span class="role-badge ${u.role}">${esc(u.role)}</span></td>
-      <td><span style="color:${u.active ? 'var(--green)' : 'var(--t4)'};font-size:10px">${u.active ? 'Active' : 'Disabled'}</span></td>
-      <td style="display:flex;gap:4px;align-items:center">
-        <button class="tbl-action" onclick="window.__toggleUserActive('${esc(u.username)}')">${u.active ? 'Disable' : 'Enable'}</button>
-        ${u.username !== me
-          ? `<button class="tbl-action del" onclick="window.__deleteUser('${esc(u.username)}')">Delete</button>`
-          : '<span style="font-size:10px;color:var(--t3)">(you)</span>'
-        }
-      </td>
-    </tr>`).join('');
+  const tbody = document.getElementById('user-table-body'); if (!tbody) return;
+  const users = loadUsers() || []; const me = _currentUser?.username;
+  tbody.innerHTML = users.map(u => `<tr><td><span style="font-family:'Geist Mono',monospace;font-size:11px">${esc(u.username)}</span></td><td><span class="role-badge ${u.role}">${esc(u.role)}</span></td><td><span style="color:${u.active?'var(--green)':'var(--t4)'};font-size:10px">${u.active?'Active':'Disabled'}</span></td><td style="display:flex;gap:4px"><button class="tbl-action" onclick="window.__toggleUserActive('${esc(u.username)}')">${u.active?'Disable':'Enable'}</button>${u.username!==me?`<button class="tbl-action del" onclick="window.__deleteUser('${esc(u.username)}')">Delete</button>`:'<span style="font-size:10px;color:var(--t3)">(you)</span>'}</td></tr>`).join('');
 }
-
-/* helpers exposed to global for inline onclick */
-function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// Expose via window so the HTML module can call them
-window.__deleteUser = function(username) {
-  if (!confirm(`Delete user "${username}"?`)) return;
-  deleteUser(username);
-  renderUserTable();
-};
-window.__toggleUserActive = function(username) {
-  toggleUserActive(username);
-  renderUserTable();
-};
-
-/* ── Exports (global namespace pattern for single-file HTML) ─────────── */
-window.Auth = {
-  initAuth, doLogin, doLogout, showLoginError, getCurrentUser,
-  loadUsers, saveUsers, addUser, renderUserTable,
-};
-
+window.__deleteUser = function(username) { if (!confirm(`Delete user "${username}"?`)) return; deleteUser(username); renderUserTable(); };
+window.__toggleUserActive = function(username) { toggleUserActive(username); renderUserTable(); };
+window.Auth = { initAuth, doLogin, doLogout, showLoginError, getCurrentUser, loadUsers, saveUsers, addUser, renderUserTable };
 </script>
 <script>
 // ===== tokens.js =====
-/**
- * tokens.js — AI provider API-key management
- * Keys stored per-provider in localStorage under k8s_linter_tok_<provider>_<field>
- */
-
 'use strict';
-
-const PROVIDER_FIELDS = {
-  openai:    ['key', 'org', 'model'],
-  anthropic: ['key', 'model'],
-  azure:     ['key', 'endpoint', 'deploy', 'version'],
-  custom:    ['url', 'key', 'model'],
-};
-
-function tokKey(p, k) { return `k8s_linter_tok_${p}_${k}`; }
-
-function loadTokenFields() {
-  for (const [p, keys] of Object.entries(PROVIDER_FIELDS)) {
-    for (const k of keys) {
-      const el = document.getElementById(`tok-${p}-${k}`);
-      if (el) el.value = localStorage.getItem(tokKey(p, k)) || el.defaultValue || '';
-    }
-  }
-}
-
+const PROVIDER_FIELDS = { openai:['key','org','model'], anthropic:['key','model'], azure:['key','endpoint','deploy','version'], custom:['url','key','model'] };
+function tokKey(p,k) { return `k8s_linter_tok_${p}_${k}`; }
+function loadTokenFields() { for (const [p,keys] of Object.entries(PROVIDER_FIELDS)) for (const k of keys) { const el = document.getElementById(`tok-${p}-${k}`); if (el) el.value = localStorage.getItem(tokKey(p,k)) || el.defaultValue || ''; } }
 function saveTokens() {
-  for (const [p, keys] of Object.entries(PROVIDER_FIELDS)) {
-    for (const k of keys) {
-      const el = document.getElementById(`tok-${p}-${k}`);
-      if (!el) continue;
-      if (el.value) localStorage.setItem(tokKey(p, k), el.value);
-      else          localStorage.removeItem(tokKey(p, k));
-    }
-  }
-  window.closeModal?.('modal-tokens');
-  window.__addLog?.('info', 'AI API keys saved');
+  for (const [p,keys] of Object.entries(PROVIDER_FIELDS)) for (const k of keys) { const el = document.getElementById(`tok-${p}-${k}`); if (!el) continue; if (el.value) localStorage.setItem(tokKey(p,k),el.value); else localStorage.removeItem(tokKey(p,k)); }
+  window.closeModal?.('modal-tokens'); window.__addLog?.('info','AI API keys saved');
 }
-
 function getProviderCredentials(provider) {
-  const g = k => localStorage.getItem(tokKey(provider, k)) || '';
-  switch (provider) {
+  const g = k => localStorage.getItem(tokKey(provider,k)) || '';
+  switch(provider) {
     case 'openai':    return { provider_api_key: g('key'), provider_base_url: 'https://api.openai.com/v1' };
     case 'anthropic': return { provider_api_key: g('key'), provider_base_url: 'https://api.anthropic.com' };
     case 'azure':     return { provider_api_key: g('key'), provider_base_url: g('endpoint') };
@@ -957,32 +955,25 @@ function getProviderCredentials(provider) {
     default:          return { provider_api_key: '', provider_base_url: '' };
   }
 }
-
 function setProviderTab(p) {
-  document.querySelectorAll('#provider-tabs .ptab').forEach(el => {
-    el.classList.toggle('active', el.dataset.p === p);
-  });
-  ['openai', 'anthropic', 'azure', 'custom'].forEach(id => {
-    const el = document.getElementById('tok-' + id);
-    if (el) el.style.display = id === p ? 'block' : 'none';
-  });
+  document.querySelectorAll('#provider-tabs .ptab').forEach(el => el.classList.toggle('active', el.dataset.p === p));
+  ['openai','anthropic','azure','custom'].forEach(id => { const el = document.getElementById('tok-'+id); if (el) el.style.display = id===p?'block':'none'; });
 }
-
-function toggleTokenVisibility(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.type = el.type === 'password' ? 'text' : 'password';
-}
-
+function toggleTokenVisibility(id) { const el = document.getElementById(id); if (!el) return; el.type = el.type==='password'?'text':'password'; }
 window.Tokens = { loadTokenFields, saveTokens, getProviderCredentials, setProviderTab, toggleTokenVisibility };
-
 </script>
 <script>
 // ===== ui.js =====
-/**
- * ui.js — Findings rendering, score display, tabs, filters, env state
- */
+'use strict';
 const STORAGE_KEY = 'k8s-linter-ui';
+const CAT_MAP = { security:'security','pod-security':'security',reliability:'reliability',networking:'networking',rbac:'rbac',general:'rbac',resources:'resource',resource:'resource',secrets:'security' };
+const CAT_LABELS = { security:'Security',reliability:'Reliability',networking:'Networking',rbac:'RBAC & IAM',resource:'Resources' };
+const envState = {
+  production:  { findings:[], scores:null, aiSummary:'', gateData:null, hasData:false },
+  staging:     { findings:[], scores:null, aiSummary:'', gateData:null, hasData:false },
+  development: { findings:[], scores:null, aiSummary:'', gateData:null, hasData:false },
+};
+let currentTab='all', currentFilter='all', currentEnv='production';
 
 function saveUIState() {
   const state = {
@@ -990,677 +981,643 @@ function saveUIState() {
     ollamaUrl: document.getElementById('ollama-url')?.value,
     model: document.getElementById('model-select')?.value,
     provider: document.getElementById('ai-provider-select')?.value,
+    sourceTab: document.querySelector('.src-tab.active')?.id?.replace('src-tab-','') || 'cluster',
+    gitRepoUrl: document.getElementById('git-repo-url')?.value,
+    gitBranch: document.getElementById('git-branch')?.value,
+    gitPath: document.getElementById('git-path')?.value,
+    gitUsername: document.getElementById('git-username')?.value,
+    manifestPath: document.getElementById('manifest-path')?.value,
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
 function loadUIState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return;
-
+  const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return;
   const state = JSON.parse(raw);
-
-  if (state.namespace)
-    document.getElementById('ns-select').value = state.namespace;
-
-  if (state.ollamaUrl)
-    document.getElementById('ollama-url').value = state.ollamaUrl;
-
-  if (state.model)
-    document.getElementById('model-select').value = state.model;
-
-  if (state.provider)
-    document.getElementById('ai-provider-select').value = state.provider;
+  if (state.namespace) document.getElementById('ns-select').value = state.namespace;
+  if (state.ollamaUrl) document.getElementById('ollama-url').value = state.ollamaUrl;
+  if (state.model) document.getElementById('model-select').value = state.model;
+  if (state.provider) document.getElementById('ai-provider-select').value = state.provider;
+  if (state.sourceTab) setSourceTab(state.sourceTab);
+  if (state.gitRepoUrl) document.getElementById('git-repo-url').value = state.gitRepoUrl;
+  if (state.gitBranch) document.getElementById('git-branch').value = state.gitBranch;
+  if (state.gitPath) document.getElementById('git-path').value = state.gitPath;
+  if (state.gitUsername) document.getElementById('git-username').value = state.gitUsername;
+  if (state.manifestPath) document.getElementById('manifest-path').value = state.manifestPath;
 }
-
-
-'use strict';
-
-const CAT_MAP = {
-  security: 'security', 'pod-security': 'security',
-  reliability: 'reliability', networking: 'networking',
-  rbac: 'rbac', general: 'rbac',
-  resources: 'resource', resource: 'resource', secrets: 'security',
-};
-const CAT_LABELS = {
-  security: 'Security', reliability: 'Reliability',
-  networking: 'Networking', rbac: 'RBAC & IAM', resource: 'Resources',
-};
-
-/* Per-environment isolated state */
-const envState = {
-  production:  { findings: [], scores: null, aiSummary: '', gateData: null, hasData: false },
-  staging:     { findings: [], scores: null, aiSummary: '', gateData: null, hasData: false },
-  development: { findings: [], scores: null, aiSummary: '', gateData: null, hasData: false },
-};
-
-let currentTab    = 'all';
-let currentFilter = 'all';
-let currentEnv    = 'production';
 
 function setTab(t) {
   currentTab = t;
   document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === t));
   renderFindings();
 }
-
 function setFilter(f) {
   currentFilter = f;
   document.querySelectorAll('.fchip').forEach(el => el.classList.toggle('active', el.dataset.f === f));
   renderFindings();
 }
-
 function setEnv(e) {
   currentEnv = e;
-
-  /* pill styles */
-  ['prod', 'stage', 'dev'].forEach(k => {
-    const el = document.getElementById('pill-' + k);
-    if (el) el.className = 'env-pill';
-  });
-  const m = { production: 'prod', staging: 'stage', development: 'dev' };
-  const pill = document.getElementById('pill-' + m[e]);
-  if (pill) pill.className = 'env-pill active-' + m[e];
-
-  /* env badge in header */
-  const badgeCls = { production: 'prod', staging: 'stage', development: 'dev' };
-  const envEl = document.getElementById('sc-env');
-  if (envEl) envEl.innerHTML = `<span class="env-badge ${badgeCls[e]}">${e.slice(0,4).toUpperCase()}</span>`;
-
+  ['prod','stage','dev'].forEach(k => { const el = document.getElementById('pill-'+k); if (el) el.className='env-pill'; });
+  const m = { production:'prod', staging:'stage', development:'dev' };
+  const pill = document.getElementById('pill-'+m[e]); if (pill) pill.className='env-pill active-'+m[e];
+  const badgeCls = { production:'prod', staging:'stage', development:'dev' };
+  const envEl = document.getElementById('sc-env'); if (envEl) envEl.innerHTML=`<span class="env-badge ${badgeCls[e]}">${e.slice(0,4).toUpperCase()}</span>`;
   const st = envState[e];
   if (st.hasData) {
     updateScores(st.scores);
-    const aiBar  = document.getElementById('ai-bar');
-    const aiText = document.getElementById('ai-text');
-    if (aiBar && aiText) {
-      if (st.aiSummary) { aiText.textContent = st.aiSummary; aiBar.className = 'ai-bar show'; }
-      else              { aiBar.className = 'ai-bar'; }
-    }
+    const aiBar=document.getElementById('ai-bar'), aiText=document.getElementById('ai-text');
+    if (aiBar && aiText) { if (st.aiSummary) { aiText.textContent=st.aiSummary; aiBar.className='ai-bar show'; } else { aiBar.className='ai-bar'; } }
     if (st.gateData) showGate(st.gateData);
-    else { const g = document.getElementById('gate-bar'); if (g) g.className = 'gate-bar'; }
+    else { const g=document.getElementById('gate-bar'); if (g) g.className='gate-bar'; }
+    updateCharts(st.scores);
   } else {
-    /* blank scores for empty environments */
-    ['sc-score','sc-grade','sc-pass','sc-fail','sc-warn','sc-resources'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.textContent = '—';
-      el.className = 'sm-val cyan';
-    });
-    const aiBar = document.getElementById('ai-bar');
-    const gBar  = document.getElementById('gate-bar');
-    if (aiBar) aiBar.className = 'ai-bar';
-    if (gBar)  gBar.className  = 'gate-bar';
+    ['sc-score','sc-grade','sc-pass','sc-fail','sc-warn','sc-resources'].forEach(id => { const el=document.getElementById(id); if (!el) return; el.textContent='—'; el.className='m-val cyan'; });
+    const aiBar=document.getElementById('ai-bar'), gBar=document.getElementById('gate-bar');
+    if (aiBar) aiBar.className='ai-bar'; if (gBar) gBar.className='gate-bar';
+    resetCharts();
   }
   renderFindings();
 }
-
 function storeEnvResult(env, data) {
-  envState[env].findings   = data.findings || [];
-  envState[env].scores     = data;
-  envState[env].aiSummary  = data.ai_summary || '';
-  envState[env].gateData   = data;
-  envState[env].hasData    = true;
+  envState[env].findings  = data.findings || [];
+  envState[env].scores    = data;
+  envState[env].aiSummary = data.ai_summary || '';
+  envState[env].gateData  = data;
+  envState[env].hasData   = true;
 }
-
 function updateScores(data) {
   if (!data) return;
-  const s  = data.summary || {};
+  const s = data.summary || {};
   const sc = Math.round(data.score || 0);
-
   const scoreEl = document.getElementById('sc-score');
-  if (scoreEl) { scoreEl.textContent = sc + '%'; scoreEl.className = 'sm-val ' + (sc >= 80 ? 'green' : sc >= 60 ? 'amber' : 'red'); }
-
+  if (scoreEl) { scoreEl.textContent=sc+'%'; scoreEl.className='m-val '+(sc>=80?'green':sc>=60?'amber':'red'); }
   const grEl = document.getElementById('sc-grade');
-  if (grEl) { grEl.textContent = data.grade || '—'; grEl.className = 'sm-val ' + (['A','B'].includes(data.grade) ? 'green' : data.grade === 'C' ? 'amber' : 'red'); }
-
-  const pass = document.getElementById('sc-pass'); if (pass) pass.textContent = s.pass ?? 0;
-  const fail = document.getElementById('sc-fail'); if (fail) fail.textContent = s.fail ?? 0;
-  const warn = document.getElementById('sc-warn'); if (warn) warn.textContent = s.warn ?? 0;
-  const res  = document.getElementById('sc-resources'); if (res) res.textContent = data.resources_scanned || '—';
+  if (grEl) { grEl.textContent=data.grade||'—'; grEl.className='m-val '+((['A','B'].includes(data.grade))?'green':data.grade==='C'?'amber':'red'); }
+  const pass=document.getElementById('sc-pass'); if (pass) pass.textContent=s.pass??0;
+  const fail=document.getElementById('sc-fail'); if (fail) fail.textContent=s.fail??0;
+  const warn=document.getElementById('sc-warn'); if (warn) warn.textContent=s.warn??0;
+  const res=document.getElementById('sc-resources'); if (res) res.textContent=data.resources_scanned||'—';
 }
-
 function showGate(data) {
-  const gate = document.getElementById('gate-select')?.value || 'high';
-  const sr   = { critical: 0, high: 1, medium: 2, low: 3 };
-  const gIdx = sr[gate] ?? 1;
-  const blocked = (data.findings || []).filter(f => f.status === 'fail' && (sr[f.severity] ?? 9) <= gIdx);
-  const el = document.getElementById('gate-bar');
-  if (!el) return;
-  if (blocked.length) { el.textContent = `CI gate FAILED — ${blocked.length} blocking finding(s) at or above "${gate}"`; el.className = 'gate-bar fail-gate'; }
-  else                { el.textContent = `CI gate PASSED — no blocking findings at or above "${gate}"`; el.className = 'gate-bar pass-gate'; }
+  const gate=document.getElementById('gate-select')?.value||'high';
+  const sr={critical:0,high:1,medium:2,low:3};
+  const gIdx=sr[gate]??1;
+  const blocked=(data.findings||[]).filter(f=>f.status==='fail'&&(sr[f.severity]??9)<=gIdx);
+  const el=document.getElementById('gate-bar'); if (!el) return;
+  if (blocked.length) { el.textContent=`CI gate FAILED — ${blocked.length} blocking finding(s) at or above "${gate}"`; el.className='gate-bar fail-gate'; }
+  else { el.textContent=`CI gate PASSED — no blocking findings at or above "${gate}"`; el.className='gate-bar pass-gate'; }
 }
-
 function renderFindings() {
-  const area     = document.getElementById('results');
-  if (!area) return;
-  area.innerHTML = '';
-  const findings = envState[currentEnv].findings;
-  const cats     = currentTab === 'all' ? ['security','reliability','networking','rbac','resource'] : [currentTab];
-  let total = 0;
-
+  const area=document.getElementById('results'); if (!area) return;
+  area.innerHTML='';
+  const findings=envState[currentEnv].findings;
+  const cats=currentTab==='all'?['security','reliability','networking','rbac','resource']:[currentTab];
+  let total=0;
   cats.forEach(cat => {
-    let cf = findings.filter(f => (CAT_MAP[f.category] || 'resource') === cat);
-    if (currentFilter !== 'all') cf = cf.filter(f => f.status === currentFilter);
+    let cf=findings.filter(f=>(CAT_MAP[f.category]||'resource')===cat);
+    if (currentFilter!=='all') cf=cf.filter(f=>f.status===currentFilter);
     if (!cf.length) return;
-
-    const pass = cf.filter(f => f.status === 'pass').length;
-    const fail = cf.filter(f => f.status === 'fail').length;
-    const warn = cf.filter(f => f.status === 'warn').length;
-
-    const block = document.createElement('div');
-    block.className = 'cat-block';
-
-    const sr = { critical: 0, high: 1, medium: 2, low: 3 };
-    cf.sort((a,b) => {
-      if (a.status === 'fail' && b.status !== 'fail') return -1;
-      if (b.status === 'fail' && a.status !== 'fail') return  1;
-      return (sr[a.severity] ?? 9) - (sr[b.severity] ?? 9);
-    });
-
-    block.innerHTML = `<div class="cat-head"><span class="cat-name">${CAT_LABELS[cat]||cat}</span><div class="cat-counts"><span style="color:var(--green)">${pass}p</span><span style="color:var(--red)">${fail}f</span><span style="color:var(--amber)">${warn}w</span></div></div>`;
-
-    cf.forEach((f, idx) => {
-      const uid   = `fd-${(f.rule_id||idx)}-${(f.resource_kind||'')}-${(f.resource_name||'').replace(/[^a-z0-9]/gi,'-')}-${idx}`;
-      const item  = document.createElement('div');
-      item.className = `finding status-${f.status}`;
-      const detail   = f.detail || '';
-      const desc     = detail.slice(0, 110) + (detail.length > 110 ? '…' : '');
-      const aiId = uid + '-ai';
-      const remAI    = f.remediation_ai     ? `<div class="d-sec"><div class="d-ttl" style="display:flex;align-items:center;justify-content:space-between">AI Remediation<button onclick="event.stopPropagation();navigator.clipboard.writeText(document.getElementById('${aiId}').textContent).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid var(--divider);background:var(--surface-2);color:var(--t3);cursor:pointer;font-family:inherit">Copy</button></div><div class="d-ai" id="${aiId}">${esc(f.remediation_ai)}</div></div>` : '';
-      const remSt    = f.remediation_static ? `<div class="d-sec"><div class="d-ttl">Static Hint</div><div class="d-body">${esc(f.remediation_static)}</div></div>` : '';
-      const detTxt   = detail               ? `<div class="d-sec"><div class="d-ttl">Detail</div><div class="d-body">${esc(detail)}</div></div>` : '';
-      const resLine  = `<div class="d-sec"><div class="d-ttl">Resource</div><div class="d-body" style="font-family:'Geist Mono',monospace;color:var(--accent)">${esc((f.resource_kind||'?')+'/'+( f.resource_name||'?'))}<span style="color:var(--t3);margin-left:10px">ns:${esc(f.namespace||'default')}</span></div></div>`;
-
-      item.innerHTML = `
-        <div class="s-icon ${f.status}">${f.status==='pass'?'✓':f.status==='fail'?'✕':f.status==='warn'?'!':'–'}</div>
-        <div class="f-body">
-          <div class="f-name">${esc(f.rule_name||f.rule_id||'—')}</div>
-          <div class="f-meta"><span class="f-res">${esc((f.resource_kind||'')+'/'+( f.resource_name||''))}</span><span style="color:var(--t4)">${esc(f.namespace||'')}</span></div>
-          <div class="f-desc">${esc(desc)}</div>
-          <div class="f-detail" id="${uid}">${remAI}${remSt}${detTxt}${resLine}</div>
-        </div>
-        <span class="sev-pill ${f.severity||'low'}">${f.severity||'low'}</span>`;
-
-      // Toggle on header click, but NOT when clicking inside the detail panel
-      item.addEventListener('click', (ev) => {
-        if (ev.target.closest('.f-detail')) return; // don't collapse when interacting inside
-        const d = document.getElementById(uid);
-        item.classList.toggle('expanded', d.classList.toggle('show'));
-      });
-      block.appendChild(item);
-      total++;
+    const pass=cf.filter(f=>f.status==='pass').length, fail=cf.filter(f=>f.status==='fail').length, warn=cf.filter(f=>f.status==='warn').length;
+    const block=document.createElement('div'); block.className='cat-block';
+    const sr={critical:0,high:1,medium:2,low:3};
+    cf.sort((a,b)=>{ if(a.status==='fail'&&b.status!=='fail') return -1; if(b.status==='fail'&&a.status!=='fail') return 1; return (sr[a.severity]??9)-(sr[b.severity]??9); });
+    block.innerHTML=`<div class="cat-head"><span class="cat-name">${CAT_LABELS[cat]||cat}</span><div class="cat-counts"><span style="color:var(--green)">${pass}p</span><span style="color:var(--red)">${fail}f</span><span style="color:var(--amber)">${warn}w</span></div></div>`;
+    cf.forEach((f,idx) => {
+      const uid=`fd-${(f.rule_id||idx)}-${(f.resource_kind||'')}-${(f.resource_name||'').replace(/[^a-z0-9]/gi,'-')}-${idx}`;
+      const item=document.createElement('div'); item.className=`finding status-${f.status}`;
+      const detail=f.detail||''; const desc=detail.slice(0,110)+(detail.length>110?'…':'');
+      const aiId=uid+'-ai';
+      const remAI=f.remediation_ai?`<div class="d-sec"><div class="d-ttl">AI Remediation<button onclick="event.stopPropagation();navigator.clipboard.writeText(document.getElementById('${aiId}').textContent).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})" style="font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid var(--divider);background:var(--surface-2);color:var(--t3);cursor:pointer;font-family:inherit">Copy</button></div><div class="d-ai" id="${aiId}">${esc(f.remediation_ai)}</div></div>`:'';
+      const remSt=f.remediation_static?`<div class="d-sec"><div class="d-ttl">Static Hint</div><div class="d-body">${esc(f.remediation_static)}</div></div>`:'';
+      const detTxt=detail?`<div class="d-sec"><div class="d-ttl">Detail</div><div class="d-body">${esc(detail)}</div></div>`:'';
+      const resLine=`<div class="d-sec"><div class="d-ttl">Resource</div><div class="d-body" style="font-family:'Geist Mono',monospace;color:var(--accent)">${esc((f.resource_kind||'?')+'/'+(f.resource_name||'?'))}<span style="color:var(--t3);margin-left:9px">ns:${esc(f.namespace||'default')}</span></div></div>`;
+      item.innerHTML=`<div class="s-icon ${f.status}">${f.status==='pass'?'✓':f.status==='fail'?'✕':f.status==='warn'?'!':'–'}</div><div class="f-body"><div class="f-name">${esc(f.rule_name||f.rule_id||'—')}</div><div class="f-meta"><span>${esc((f.resource_kind||'')+'/'+(f.resource_name||''))}</span><span style="color:var(--t4)">${esc(f.namespace||'')}</span></div><div class="f-desc">${esc(desc)}</div><div class="f-detail" id="${uid}">${remAI}${remSt}${detTxt}${resLine}</div></div><span class="sev-pill ${f.severity||'low'}">${f.severity||'low'}</span>`;
+      item.addEventListener('click', ev => { if (ev.target.closest('.f-detail')) return; const d=document.getElementById(uid); item.classList.toggle('expanded',d.classList.toggle('show')); });
+      block.appendChild(item); total++;
     });
     area.appendChild(block);
   });
+  if (!total) area.innerHTML=`<div class="empty-state"><div class="empty-glyph">◇</div><div>${findings.length?'No findings match current filter.':'Press Run Audit to begin.'}</div></div>`;
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+window.UI = { setTab, setFilter, setEnv, storeEnvResult, updateScores, showGate, renderFindings, getCurrentEnv:()=>currentEnv, getEnvState:()=>envState, saveUIState, loadUIState };
+</script>
+<script>
+// ===== charts.js =====
+'use strict';
+let _donutChart = null, _radarChart = null;
 
-  if (!total) {
-    area.innerHTML = `<div class="empty-state"><div class="empty-glyph">&#9671;</div><div>${findings.length ? 'No findings match current filter.' : 'Press Run Audit to begin.'}</div></div>`;
+function getChartColors() {
+  const s = getComputedStyle(document.documentElement);
+  return {
+    green:  s.getPropertyValue('--green').trim(),
+    red:    s.getPropertyValue('--red').trim(),
+    amber:  s.getPropertyValue('--amber').trim(),
+    accent: s.getPropertyValue('--accent').trim(),
+    purple: s.getPropertyValue('--purple').trim() || '#a78bfa',
+    t3:     s.getPropertyValue('--t3').trim(),
+    t4:     s.getPropertyValue('--t4').trim(),
+    surface3: s.getPropertyValue('--surface-3').trim(),
+    divider:  s.getPropertyValue('--divider').trim(),
+  };
+}
+
+function animateCount(el, target, duration=700) {
+  if (!el) return;
+  const start = parseInt(el.textContent) || 0;
+  const startTime = performance.now();
+  function step(now) {
+    const p = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(start + (target - start) * ease);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function updateCharts(data) {
+  if (!data) return;
+  const findings = data.findings || [];
+  const s = data.summary || {};
+  const sc = Math.round(data.score || 0);
+  const c = getChartColors();
+
+  // Score ring
+  const ringFill = document.getElementById('score-ring-fill');
+  const ringPct  = document.getElementById('ring-pct');
+  const ringGrade = document.getElementById('ring-grade');
+  if (ringFill) {
+    const circumference = 2 * Math.PI * 45; // 283
+    const offset = circumference - (sc / 100) * circumference;
+    ringFill.style.strokeDasharray = circumference;
+    ringFill.style.strokeDashoffset = circumference;
+    ringFill.style.stroke = sc >= 80 ? c.green : sc >= 60 ? c.amber : c.red;
+    setTimeout(() => { ringFill.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1)'; ringFill.style.strokeDashoffset = offset; }, 50);
+  }
+  if (ringPct) animateCount(ringPct, sc);
+  if (ringGrade) { ringGrade.textContent = data.grade || '—'; }
+
+  // Stat counters
+  animateCount(document.getElementById('stat-pass'), s.pass || 0);
+  animateCount(document.getElementById('stat-fail'), s.fail || 0);
+  animateCount(document.getElementById('stat-warn'), s.warn || 0);
+
+  // Severity breakdown
+  const sevCounts = { critical:0, high:0, medium:0, low:0 };
+  findings.forEach(f => { if (f.status === 'fail' && sevCounts[f.severity] !== undefined) sevCounts[f.severity]++; });
+  animateCount(document.getElementById('sev-critical'), sevCounts.critical);
+  animateCount(document.getElementById('sev-high'),     sevCounts.high);
+  animateCount(document.getElementById('sev-medium'),   sevCounts.medium);
+  animateCount(document.getElementById('sev-low'),      sevCounts.low);
+
+  // Category bar chart
+  const catCounts = { Security:0, Reliability:0, Networking:0, 'RBAC & IAM':0, Resources:0 };
+  const CAT_MAP_LOCAL = { security:'Security','pod-security':'Security',reliability:'Reliability',networking:'Networking',rbac:'RBAC & IAM',general:'RBAC & IAM',resources:'Resources',resource:'Resources',secrets:'Security' };
+  findings.filter(f => f.status === 'fail').forEach(f => { const k = CAT_MAP_LOCAL[f.category]; if (k) catCounts[k]++; });
+  const maxCat = Math.max(...Object.values(catCounts), 1);
+  const barColors = { Security: c.red, Reliability: c.amber, Networking: c.accent, 'RBAC & IAM': c.purple, Resources: c.green };
+  const barChart = document.getElementById('cat-bar-chart');
+  if (barChart) {
+    barChart.innerHTML = Object.entries(catCounts).map(([label, count]) => `
+      <div class="bar-row">
+        <div class="bar-label">${label}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="background:${barColors[label]};--w:${(count/maxCat*100).toFixed(1)}%" data-target="${(count/maxCat*100).toFixed(1)}"></div>
+        </div>
+        <div class="bar-count">${count}</div>
+      </div>`).join('');
+    // Animate bars
+    setTimeout(() => {
+      barChart.querySelectorAll('.bar-fill').forEach(el => {
+        el.style.transition = 'width 1s cubic-bezier(.22,1,.36,1)';
+        el.style.width = el.dataset.target + '%';
+      });
+    }, 60);
+  }
+
+  // Donut chart
+  const donutCtx = document.getElementById('chart-donut')?.getContext('2d');
+  if (donutCtx) {
+    if (_donutChart) _donutChart.destroy();
+    _donutChart = new Chart(donutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Pass', 'Fail', 'Warn'],
+        datasets: [{ data: [s.pass||0, s.fail||0, s.warn||0], backgroundColor: [c.green, c.red, c.amber], borderWidth: 0, hoverOffset: 6 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true, cutout: '68%',
+        animation: { animateRotate: true, duration: 900, easing: 'easeOutQuart' },
+        plugins: { legend: { position: 'bottom', labels: { color: c.t3, font: { family: 'Outfit', size: 11 }, padding: 12, boxWidth: 10 } }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}` } } }
+      }
+    });
+  }
+
+  // Radar chart
+  const radarCtx = document.getElementById('chart-radar')?.getContext('2d');
+  if (radarCtx) {
+    if (_radarChart) _radarChart.destroy();
+    const catFail = { Security:0, Reliability:0, Networking:0, 'RBAC & IAM':0, Resources:0 };
+    const catTotal = { Security:0, Reliability:0, Networking:0, 'RBAC & IAM':0, Resources:0 };
+    findings.forEach(f => { const k = CAT_MAP_LOCAL[f.category]; if (k) { catTotal[k]++; if (f.status==='pass') catFail[k]++; } });
+    const radarData = Object.keys(catFail).map(k => catTotal[k] ? Math.round((catFail[k]/catTotal[k])*100) : 0);
+    _radarChart = new Chart(radarCtx, {
+      type: 'radar',
+      data: {
+        labels: ['Security','Reliability','Networking','RBAC','Resources'],
+        datasets: [{ label: 'Pass %', data: radarData, backgroundColor: c.accent.replace(')',',0.15)').replace('rgb','rgba'), borderColor: c.accent, borderWidth: 2, pointBackgroundColor: c.accent, pointRadius: 3 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        animation: { duration: 900, easing: 'easeOutQuart' },
+        scales: { r: { min:0, max:100, ticks: { display:false, stepSize:25 }, grid: { color: c.divider }, pointLabels: { color: c.t3, font: { family:'Outfit', size:10 } }, angleLines: { color: c.divider } } },
+        plugins: { legend: { display: false } }
+      }
+    });
   }
 }
 
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function resetCharts() {
+  const ringFill = document.getElementById('score-ring-fill');
+  if (ringFill) { ringFill.style.strokeDashoffset = 283; ringFill.style.stroke = ''; }
+  const ringPct = document.getElementById('ring-pct'); if (ringPct) ringPct.textContent = '—';
+  const ringGrade = document.getElementById('ring-grade'); if (ringGrade) ringGrade.textContent = '—';
+  ['stat-pass','stat-fail','stat-warn','sev-critical','sev-high','sev-medium','sev-low'].forEach(id => { const el=document.getElementById(id); if (el) el.textContent='0'; });
+  const barChart = document.getElementById('cat-bar-chart');
+  if (barChart) barChart.innerHTML = '<div style="font-size:12px;color:var(--t4);text-align:center;padding:20px">Run an audit to see results</div>';
+  if (_donutChart) { _donutChart.destroy(); _donutChart = null; }
+  if (_radarChart) { _radarChart.destroy(); _radarChart = null; }
+}
 
-window.UI = { setTab, setFilter, setEnv, storeEnvResult, updateScores, showGate, renderFindings, getCurrentEnv: () => currentEnv, getEnvState: () => envState };
-
+window.Charts = { updateCharts, resetCharts };
 </script>
 <script>
 // ===== audit.js =====
-/**
- * audit.js — Run audit, stop audit, SSE stream parsing, server health checks
- */
-
 'use strict';
+let isRunning=false, abortController=null, fakeP=0, ticker=null;
 
-let isRunning       = false;
-let abortController = null;
-let fakeP           = 0;
-let ticker          = null;
-
-/* ── Helpers ────────────────────────────────────────────────────────── */
-function getApiBase()   { return (document.getElementById('api-base')?.value || 'http://localhost:8000').replace(/\/$/, ''); }
-function getOllamaUrl() { return document.getElementById('ollama-url')?.value || 'http://localhost:11434'; }
+function getApiBase()   { return (document.getElementById('api-base')?.value||'http://localhost:8000').replace(/\/$/,''); }
+function getOllamaUrl() { return document.getElementById('ollama-url')?.value||'http://localhost:11434'; }
+function getSource()    { return document.querySelector('.src-tab.active')?.id?.replace('src-tab-','')||'cluster'; }
+function getManifestPath() { return document.getElementById('manifest-path')?.value||'./manifests'; }
+function getGitConfig() {
+  return {
+    repo_url:  document.getElementById('git-repo-url')?.value||'',
+    branch:    document.getElementById('git-branch')?.value||'main',
+    path:      document.getElementById('git-path')?.value||'/',
+    token:     document.getElementById('git-token')?.value||'',
+    username:  document.getElementById('git-username')?.value||'',
+  };
+}
 function getModel() {
   const provider = document.getElementById('ai-provider-select')?.value;
-
-  // Load saved tokens (same place UI stores API keys)
-  const tokens = JSON.parse(localStorage.getItem('ai_tokens') || '{}');
-
-  // 🔥 Provider-based model selection
-  if (provider === 'openai') {
-    return tokens?.openai?.model || 'gpt-4o';
-  }
-
-  if (provider === 'anthropic') {
-    return tokens?.anthropic?.model || 'claude-sonnet-4-20250514';
-  }
-
-  if (provider === 'azure') {
-    return tokens?.azure?.deploy || 'gpt-4o';
-  }
-
-  if (provider === 'custom') {
-    return tokens?.custom?.model || 'llama3';
-  }
-
-  // Default → Ollama
-  return document.getElementById('model-select')?.value || 'llama3';
+  const tokens = JSON.parse(localStorage.getItem('ai_tokens')||'{}');
+  if (provider==='openai')    return tokens?.openai?.model||'gpt-4o';
+  if (provider==='anthropic') return tokens?.anthropic?.model||'claude-sonnet-4-20250514';
+  if (provider==='azure')     return tokens?.azure?.deploy||'gpt-4o';
+  if (provider==='custom')    return tokens?.custom?.model||'llama3';
+  return document.getElementById('model-select')?.value||'llama3';
 }
-function _ts()          { return new Date().toLocaleTimeString('en-GB', { hour12: false }); }
-
+function _ts() { return new Date().toLocaleTimeString('en-GB',{hour12:false}); }
 function addLog(type, msg) {
-  const area = document.getElementById('log-area');
-  if (!area) return;
-  const el = document.createElement('div');
-  el.className = 'log-entry ' + type;
-  const tags = { pass: 'PASS', fail: 'FAIL', warn: 'WARN', info: 'INFO', rule: 'RULE', resource: 'RES' };
-  el.innerHTML = `<span class="log-ts">${_ts()}</span><span class="log-tag">${tags[type] || 'INFO'}</span><span class="log-msg">${esc(msg)}</span>`;
+  const area=document.getElementById('log-area'); if (!area) return;
+  const el=document.createElement('div'); el.className='log-entry '+type;
+  const tags={pass:'PASS',fail:'FAIL',warn:'WARN',info:'INFO',rule:'RULE',resource:'RES'};
+  el.innerHTML=`<span class="log-ts">${_ts()}</span><span class="log-tag">${tags[type]||'INFO'}</span><span class="log-msg">${esc(msg)}</span>`;
   area.appendChild(el);
-  // only auto-scroll if user is near the bottom
-  if (area.scrollHeight - area.scrollTop - area.clientHeight < 80) {
-    area.scrollTop = area.scrollHeight;
-  }
+  if (area.scrollHeight-area.scrollTop-area.clientHeight<80) area.scrollTop=area.scrollHeight;
 }
 window.__addLog = addLog;
-
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function classifyLog(text) {
-  if (/^CHECK\s/.test(text) || /^RULE\s/.test(text))     return 'rule';
-  if (/^RESOURCE\s/.test(text) || /^FETCHED\s/.test(text)) return 'resource';
+  if (/^CHECK\s|^RULE\s/.test(text)) return 'rule';
+  if (/^RESOURCE\s|^FETCHED\s/.test(text)) return 'resource';
   if (/^PROFILE\s|^RULES\s|^ENGINE\s|^AI-REM\s|^AI\s|^\[/.test(text)) return 'info';
-  if (/^COMPLETE\s/.test(text) || /✔|PASS/.test(text))   return 'pass';
-  if (/^FAIL\s/.test(text) || /✖|FAIL/.test(text))       return 'fail';
-  if (/^WARN\s/.test(text))                               return 'warn';
+  if (/^COMPLETE\s|✔|PASS/.test(text)) return 'pass';
+  if (/^FAIL\s|✖|FAIL/.test(text)) return 'fail';
+  if (/^WARN\s/.test(text)) return 'warn';
   return 'info';
 }
-
 function setProgress(pct, lbl) {
-  const fill  = document.getElementById('prog-fill');
-  const pctEl = document.getElementById('prog-pct');
-  const lblEl = document.getElementById('prog-lbl');
-  if (fill)  fill.style.width = pct + '%';
-  if (pctEl) pctEl.textContent = pct > 0 ? Math.round(pct) + '%' : '';
-  if (lbl && lblEl) lblEl.textContent = String(lbl).replace(/[^\x20-\x7E]/g, '').trim().slice(0, 90);
+  const fill=document.getElementById('prog-fill'), pctEl=document.getElementById('prog-pct'), lblEl=document.getElementById('prog-lbl');
+  if (fill) fill.style.width=pct+'%';
+  if (pctEl) pctEl.textContent=pct>0?Math.round(pct)+'%':'';
+  if (lbl&&lblEl) lblEl.textContent=String(lbl).replace(/[^\x20-\x7E]/g,'').trim().slice(0,90);
 }
-
-function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-
-/* ── Server / namespace / model checks ─────────────────────────────── */
-
 async function checkServer() {
-  const dot = document.getElementById('srv-dot');
-  const txt = document.getElementById('srv-txt');
+  const dot=document.getElementById('srv-dot'), txt=document.getElementById('srv-txt');
   try {
-    const r = await fetch(getApiBase() + '/health', { signal: AbortSignal.timeout(3000) });
-    if (dot) dot.className = 'dot' + (r.ok ? ' alive' : '');
-    if (txt) txt.textContent = r.ok ? 'online' : 'error';
-  } catch {
-    if (dot) dot.className = 'dot';
-    if (txt) txt.textContent = 'offline';
-  }
+    const r=await fetch(getApiBase()+'/health',{signal:AbortSignal.timeout(3000)});
+    if (dot) dot.className='dot'+(r.ok?' alive':'');
+    if (txt) txt.textContent=r.ok?'online':'error';
+  } catch { if (dot) dot.className='dot'; if (txt) txt.textContent='offline'; }
 }
-
 async function loadNamespaces() {
   try {
-    const r = await fetch(getApiBase() + '/api/namespaces');
-    if (!r.ok) return;
-    const d   = await r.json();
-    const sel = document.getElementById('ns-select');
-    if (sel) sel.innerHTML = d.namespaces.map(n => `<option value="${n}">${n}</option>`).join('');
-  } catch {
-    const sel = document.getElementById('ns-select');
-    if (sel && !sel.options.length) sel.innerHTML = '<option value="default">default</option>';
-  }
+    const r=await fetch(getApiBase()+'/api/namespaces'); if (!r.ok) return;
+    const d=await r.json(); const sel=document.getElementById('ns-select');
+    if (sel) sel.innerHTML=d.namespaces.map(n=>`<option value="${n}">${n}</option>`).join('');
+  } catch { const sel=document.getElementById('ns-select'); if (sel&&!sel.options.length) sel.innerHTML='<option value="default">default</option>'; }
 }
-
 async function loadProfiles() {
   try {
-    const r = await fetch(getApiBase() + '/api/profiles');
-    if (!r.ok) return;
-    const d   = await r.json();
-    const sel = document.getElementById('profile-select');
-    if (sel && d.profiles?.length) {
-      sel.innerHTML = d.profiles.map(p => `<option value="${p.value}">${p.label}</option>`).join('');
-    }
-  } catch { /* keep static fallback */ }
+    const r=await fetch(getApiBase()+'/api/profiles'); if (!r.ok) return;
+    const d=await r.json(); const sel=document.getElementById('profile-select');
+    if (sel&&d.profiles?.length) sel.innerHTML=d.profiles.map(p=>`<option value="${p.value}">${p.label}</option>`).join('');
+  } catch {}
 }
-
 async function loadModels() {
-  const provider = document.getElementById('ai-provider-select')?.value || 'ollama';
-  const sel = document.getElementById('model-select');
-  const btn = document.querySelector('.ref-btn');
-  if (btn) btn.style.opacity = '0.5';
-
+  const provider=document.getElementById('ai-provider-select')?.value||'ollama';
+  const sel=document.getElementById('model-select'); const btn=document.querySelector('.ref-btn');
+  if (btn) btn.style.opacity='0.5';
   try {
-    if (provider === 'openai') {
-      const tokens = JSON.parse(localStorage.getItem('ai_tokens') || '{}');
-      const apiKey = tokens?.openai?.key || localStorage.getItem('k8s_linter_tok_openai_key') || '';
-      if (!apiKey) { addLog('warn', 'OpenAI API key not set — open AI API Keys to configure'); if (btn) btn.style.opacity=''; return; }
-      const r = await fetch('https://api.openai.com/v1/models', {
-        headers: { 'Authorization': `Bearer ${apiKey}` },
-        signal: AbortSignal.timeout(8000),
-      });
-      if (!r.ok) { addLog('warn', `OpenAI API error: ${r.status} ${r.statusText}`); return; }
-      const d = await r.json();
-      const gptModels = (d.data || [])
-        .map(m => m.id)
-        .filter(id => /^gpt-/.test(id))
-        .sort((a,b) => b.localeCompare(a));
-      if (!gptModels.length) { addLog('warn', 'No GPT models found in OpenAI account'); return; }
-      const cur = sel?.value;
-      if (sel) sel.innerHTML = gptModels.map(m => `<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
-      addLog('info', `Loaded ${gptModels.length} OpenAI models`);
-
-    } else if (provider === 'anthropic') {
-      const models = ['claude-opus-4-5','claude-sonnet-4-5','claude-haiku-4-5-20251001','claude-opus-4-6','claude-sonnet-4-6'];
-      const cur = sel?.value;
-      if (sel) sel.innerHTML = models.map(m => `<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
-      addLog('info', 'Loaded Anthropic model list');
-
-    } else if (provider === 'azure') {
-      const tokens = JSON.parse(localStorage.getItem('ai_tokens') || '{}');
-      const deploy = tokens?.azure?.deploy || localStorage.getItem('k8s_linter_tok_azure_deploy') || '';
-      if (deploy && sel) sel.innerHTML = `<option value="${deploy}">${deploy}</option>`;
-      addLog('info', 'Azure: using deployment name from API Keys config');
-
+    if (provider==='openai') {
+      const apiKey=localStorage.getItem('k8s_linter_tok_openai_key')||'';
+      if (!apiKey) { addLog('warn','OpenAI API key not set'); if (btn) btn.style.opacity=''; return; }
+      const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':`Bearer ${apiKey}`},signal:AbortSignal.timeout(8000)});
+      if (!r.ok) { addLog('warn',`OpenAI API error: ${r.status}`); return; }
+      const d=await r.json();
+      const gptModels=(d.data||[]).map(m=>m.id).filter(id=>/^gpt-/.test(id)).sort((a,b)=>b.localeCompare(a));
+      if (!gptModels.length) { addLog('warn','No GPT models found'); return; }
+      const cur=sel?.value; if (sel) sel.innerHTML=gptModels.map(m=>`<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+      addLog('info',`Loaded ${gptModels.length} OpenAI models`);
+    } else if (provider==='anthropic') {
+      const models=['claude-opus-4-5','claude-sonnet-4-5','claude-haiku-4-5-20251001'];
+      const cur=sel?.value; if (sel) sel.innerHTML=models.map(m=>`<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+      addLog('info','Loaded Anthropic model list');
     } else {
-      // Ollama
-      const ollamaUrl = encodeURIComponent(getOllamaUrl());
-      const r = await fetch(`${getApiBase()}/api/ollama/models?url=${ollamaUrl}`, { signal: AbortSignal.timeout(6000) });
-      if (!r.ok) { const err = await r.json().catch(()=>({})); addLog('warn', `Ollama: ${err.detail || r.statusText}`); return; }
-      const d = await r.json();
-      if (!d.models?.length) { addLog('warn', 'Ollama returned no models'); return; }
-      const cur = sel?.value;
-      if (sel) sel.innerHTML = d.models.map(m => `<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
-      addLog('info', `Loaded ${d.models.length} model(s) from Ollama`);
+      const ollamaUrl=encodeURIComponent(getOllamaUrl());
+      const r=await fetch(`${getApiBase()}/api/ollama/models?url=${ollamaUrl}`,{signal:AbortSignal.timeout(6000)});
+      if (!r.ok) { const err=await r.json().catch(()=>({})); addLog('warn',`Ollama: ${err.detail||r.statusText}`); return; }
+      const d=await r.json();
+      if (!d.models?.length) { addLog('warn','Ollama returned no models'); return; }
+      const cur=sel?.value; if (sel) sel.innerHTML=d.models.map(m=>`<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+      addLog('info',`Loaded ${d.models.length} model(s) from Ollama`);
     }
-  } catch (e) {
-    addLog('warn', `Could not load models: ${e.message}`);
-  } finally {
-    if (btn) btn.style.opacity = '';
-  }
+  } catch(e) { addLog('warn',`Could not load models: ${e.message}`); }
+  finally { if (btn) btn.style.opacity=''; }
 }
-
-/* ── Stop ───────────────────────────────────────────────────────────── */
-
 function stopAudit() {
   if (abortController) abortController.abort();
-  clearInterval(ticker);
-  setProgress(0, 'Stopped');
-  addLog('warn', 'Audit stopped by user');
-  _resetButtons();
-  isRunning = false;
+  clearInterval(ticker); setProgress(0,'Stopped'); addLog('warn','Audit stopped by user'); _resetButtons(); isRunning=false;
 }
-
 function _resetButtons() {
-  const btn   = document.getElementById('run-btn');
-  const inner = document.getElementById('btn-inner');
-  const stop  = document.getElementById('stop-btn');
-  if (btn)   { btn.disabled = false; btn.className = 'run-btn'; }
-  if (inner) inner.innerHTML = '&#9654;&nbsp; Run Audit';
-  if (stop)  stop.classList.remove('visible');
+  const btn=document.getElementById('run-btn'), inner=document.getElementById('btn-inner'), stop=document.getElementById('stop-btn');
+  if (btn) { btn.disabled=false; btn.className='run-btn'; }
+  if (inner) inner.innerHTML='▶ Run Audit';
+  if (stop) stop.classList.remove('visible');
 }
-
-/* ── Run audit ──────────────────────────────────────────────────────── */
-
 async function runLint() {
   if (isRunning) return;
-  isRunning       = true;
-  abortController = new AbortController();
+  isRunning=true; abortController=new AbortController();
+  const btn=document.getElementById('run-btn'), inner=document.getElementById('btn-inner'), stop=document.getElementById('stop-btn');
+  if (btn) { btn.disabled=true; btn.className='run-btn running'; }
+  if (inner) inner.innerHTML='<span class="spinner"></span>&nbsp; Running…';
+  if (stop) stop.classList.add('visible');
+  document.getElementById('log-area').innerHTML='';
+  document.getElementById('results').innerHTML='';
+  document.getElementById('ai-bar')?.setAttribute('class','ai-bar');
+  document.getElementById('gate-bar')?.setAttribute('class','gate-bar');
 
-  const btn   = document.getElementById('run-btn');
-  const inner = document.getElementById('btn-inner');
-  const stop  = document.getElementById('stop-btn');
-  if (btn)   { btn.disabled = true; btn.className = 'run-btn running'; }
-  if (inner) inner.innerHTML = '<span class="spinner"></span>&nbsp; Running…';
-  if (stop)  stop.classList.add('visible');
+  const env=window.UI.getCurrentEnv();
+  const ns=document.getElementById('ns-select')?.value||'default';
+  const prof=document.getElementById('profile-select')?.value||'custom';
+  const aiProv=document.getElementById('ai-provider-select')?.value||'ollama';
+  const aiOn=document.getElementById('toggle-ai')?.classList.contains('on')??true;
+  const creds=window.Tokens.getProviderCredentials(aiProv);
+  const source=getSource();
+  const gitCfg=getGitConfig();
 
-  const logArea = document.getElementById('log-area');
-  const results = document.getElementById('results');
-  if (logArea) logArea.innerHTML = '';
-  if (results) results.innerHTML = '';
-  document.getElementById('ai-bar')?.setAttribute('class', 'ai-bar');
-  document.getElementById('gate-bar')?.setAttribute('class', 'gate-bar');
+  // Resolve source + manifest path
+  let resolvedSource = source === 'github' ? 'manifest' : source;
+  let resolvedManifestPath = getManifestPath();
+  if (source === 'github') {
+    const repoUrl = gitCfg.repo_url.trim();
+    if (!repoUrl) {
+      addLog('warn','GitHub source selected but no repository URL configured.');
+      showToast('No repo URL set','Configure Git settings in the sidebar','warn','git-warn');
+      _resetButtons(); isRunning=false; clearInterval(ticker); return;
+    }
+    try {
+      const u = new URL(repoUrl);
+      if (gitCfg.token) u.username = gitCfg.token;
+      else if (gitCfg.username) u.username = gitCfg.username;
+      resolvedManifestPath = u.toString();
+    } catch { resolvedManifestPath = repoUrl; }
+    showToast('Cloning from Git', gitCfg.repo_url.replace(/https?:\/\/[^@]*@?/,''), 'info', 'git-clone', 4000);
+  }
 
-  const env    = window.UI.getCurrentEnv();
-  const ns     = document.getElementById('ns-select')?.value     || 'default';
-  const prof   = document.getElementById('profile-select')?.value || 'custom';
-  const aiProv = document.getElementById('ai-provider-select')?.value || 'ollama';
-  const aiOn   = document.getElementById('toggle-ai')?.classList.contains('on') ?? true;
-  const creds  = window.Tokens.getProviderCredentials(aiProv);
-
-  addLog('info', `env=${env}  ns=${ns}  profile=${prof}  model=${getModel()}  provider=${aiProv}  ai=${aiOn}`);
-
-  fakeP  = 0;
-  ticker = setInterval(() => { fakeP = Math.min(fakeP + 0.6, 85); setProgress(fakeP); }, 800);
+  addLog('info',`env=${env}  source=${source}  ns=${ns}  profile=${prof}  provider=${aiProv}  ai=${aiOn}`);
+  fakeP=0; ticker=setInterval(()=>{ fakeP=Math.min(fakeP+0.6,85); setProgress(fakeP); },800);
 
   const payload = {
-    source: 'cluster', namespace: ns, manifest_path: './manifests',
+    source: resolvedSource,
+    namespace: ns,
+    manifest_path: resolvedManifestPath,
     profile: prof,
     provider: aiProv,
     model: getModel(),
     ollama_url: getOllamaUrl(),
     provider_base_url: creds.provider_base_url,
-    provider_api_key:  creds.provider_api_key,
+    provider_api_key: creds.provider_api_key,
     ai_remediation: aiOn,
   };
 
   try {
-    const resp = await fetch(getApiBase() + '/api/lint/stream', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: abortController.signal,
-    });
-
-    if (!resp.ok) {
-      const e = await resp.json().catch(() => ({ detail: resp.statusText }));
-      throw new Error(e.detail || resp.statusText);
-    }
-
-    const reader  = resp.body.getReader();
-    const decoder = new TextDecoder();
-    let buf = '';
-
+    const resp=await fetch(getApiBase()+'/api/lint/stream',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:abortController.signal});
+    if (!resp.ok) { const e=await resp.json().catch(()=>({detail:resp.statusText})); throw new Error(e.detail||resp.statusText); }
+    const reader=resp.body.getReader(); const decoder=new TextDecoder(); let buf='';
     while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buf += decoder.decode(value, { stream: true });
-      const parts = buf.split('\n\n');
-      buf = parts.pop(); // keep incomplete last chunk
-
+      const {done,value}=await reader.read(); if (done) break;
+      buf+=decoder.decode(value,{stream:true});
+      const parts=buf.split('\n\n'); buf=parts.pop();
       for (const part of parts) {
         if (!part.trim()) continue;
-        let evType = 'log', dataLine = '';
-        for (const line of part.split('\n')) {
-          if (line.startsWith('event: ')) evType   = line.slice(7).trim();
-          if (line.startsWith('data: '))  dataLine = line.slice(6).trim();
-        }
+        let evType='log', dataLine='';
+        for (const line of part.split('\n')) { if (line.startsWith('event: ')) evType=line.slice(7).trim(); if (line.startsWith('data: ')) dataLine=line.slice(6).trim(); }
         if (!dataLine) continue;
-
-        let text;
-        try { text = JSON.parse(dataLine); } catch { text = dataLine; }
-
-        if (evType === 'log') {
-          addLog(classifyLog(text), text);
-          setProgress(fakeP, text);
-
-        } else if (evType === 'result') {
+        let text; try { text=JSON.parse(dataLine); } catch { text=dataLine; }
+        if (evType==='log') { addLog(classifyLog(text),text); setProgress(fakeP,text); }
+        else if (evType==='result') {
           clearInterval(ticker);
-          const data = typeof text === 'string' ? JSON.parse(text) : text;
-          window.UI.storeEnvResult(env, data);
-          setProgress(100, 'Audit complete');
+          const data=typeof text==='string'?JSON.parse(text):text;
+          window.UI.storeEnvResult(env,data);
+          setProgress(100,'Audit complete');
           window.UI.updateScores(data);
-          if (data.ai_summary) {
-            const aiText = document.getElementById('ai-text');
-            const aiBar  = document.getElementById('ai-bar');
-            if (aiText) aiText.textContent = data.ai_summary;
-            if (aiBar)  aiBar.className = 'ai-bar show';
-          }
+          window.Charts.updateCharts(data);
+          if (data.ai_summary) { const aiText=document.getElementById('ai-text'), aiBar=document.getElementById('ai-bar'); if (aiText) aiText.textContent=data.ai_summary; if (aiBar) aiBar.className='ai-bar show'; }
           window.UI.showGate(data);
           window.UI.renderFindings();
-          addLog('pass', `Complete — ${(data.findings || []).length} findings · score ${Math.round(data.score || 0)}% [${data.grade}]`);
-
-        } else if (evType === 'error') {
-          clearInterval(ticker);
-          addLog('fail', 'Error: ' + text);
-          setProgress(0, 'Error');
-        }
+          addLog('pass',`Complete — ${(data.findings||[]).length} findings · score ${Math.round(data.score||0)}% [${data.grade}]`);
+          showToast(`Audit complete · ${data.grade}`,`Score ${Math.round(data.score||0)}% · ${(data.findings||[]).length} findings`,'saved','audit-done',3000);
+        } else if (evType==='error') { clearInterval(ticker); addLog('fail','Error: '+text); setProgress(0,'Error'); }
       }
     }
-
-  } catch (e) {
+  } catch(e) {
     clearInterval(ticker);
-    if (e.name !== 'AbortError') {
-      setProgress(0, 'Connection error');
-      addLog('fail', 'API error: ' + e.message);
-      addLog('warn', 'Is uvicorn running?  uvicorn server:app --port 8000');
-    }
+    if (e.name!=='AbortError') { setProgress(0,'Connection error'); addLog('fail','API error: '+e.message); addLog('warn','Is uvicorn running?  uvicorn server:app --port 8000'); }
   }
+  if (document.getElementById('btn-inner')) document.getElementById('btn-inner').innerHTML='▶ Re-run';
+  _resetButtons(); isRunning=false;
+}
+window.Audit = { runLint, stopAudit, checkServer, loadNamespaces, loadProfiles, loadModels, addLog };
+</script>
+<script>
+// ===== glue / boot =====
+window.Auth = Auth;
 
-  if (document.getElementById('btn-inner')) {
-    document.getElementById('btn-inner').innerHTML = '&#9654;&nbsp; Re-run';
-  }
-  _resetButtons();
-  isRunning = false;
+/* Source tab switching */
+function setSourceTab(tab) {
+  ['cluster','manifest','github'].forEach(t => {
+    document.getElementById('src-tab-'+t)?.classList.toggle('active', t===tab);
+    const panel = document.getElementById('src-panel-'+t);
+    if (panel) { panel.classList.toggle('active', t===tab); }
+  });
+  UI.saveUIState();
 }
 
-window.Audit = { runLint, stopAudit, checkServer, loadNamespaces, loadProfiles, loadModels, addLog };
+/* Git token visibility */
+function toggleGitToken() {
+  const el = document.getElementById('git-token'); if (!el) return;
+  el.type = el.type==='password'?'text':'password';
+}
 
-</script>
+/* ── Toast notification system ── */
+(function() {
+  const container = document.createElement('div');
+  container.className = 'toast-container';
+  container.id = 'toast-container';
+  document.body.appendChild(container);
+})();
 
-<script>
-window.Auth = Auth;
-/* ── Glue — bare global functions called from inline HTML onclick attrs ── */
+const _toastTimers = {};
+function showToast(msg, sub='', type='saved', id='default', duration=2200) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  // Remove existing toast with same id
+  const existing = document.getElementById('toast-'+id);
+  if (existing) { clearTimeout(_toastTimers[id]); existing.remove(); }
+
+  const icons = { saved:'✓', info:'ℹ', warn:'⚠', error:'✕' };
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.id = 'toast-'+id;
+  toast.innerHTML = `<div class="toast-icon">${icons[type]||'✓'}</div><div class="toast-msg">${msg}${sub?`<div class="toast-sub">${sub}</div>`:''}</div>`;
+  container.appendChild(toast);
+
+  _toastTimers[id] = setTimeout(() => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 260);
+  }, duration);
+}
+window.showToast = showToast;
+
+/* Sidebar input change handler — debounced toast */
+const _sidebarDebounce = {};
+function onSidebarChange(el, label, type='saved') {
+  const key = el.id || label;
+  clearTimeout(_sidebarDebounce[key]);
+  _sidebarDebounce[key] = setTimeout(() => {
+    const val = el.value || el.options?.[el.selectedIndex]?.text || '';
+    const sub = val.length > 40 ? val.slice(0,38)+'…' : val;
+    showToast(label, sub, type, key, 1800);
+    UI.saveUIState();
+  }, 600);
+}
+window.onSidebarChange = onSidebarChange;
+function setView(view) {
+  document.querySelectorAll('.view-tab').forEach(el => el.classList.toggle('active', el.dataset.view===view));
+  document.querySelectorAll('.view-panel').forEach(el => el.classList.toggle('active', el.id==='view-'+view));
+  const catRow = document.getElementById('cat-tabs-row');
+  if (catRow) catRow.classList.toggle('visible', view==='findings');
+}
+
+/* Provider badge update */
+function updateProviderBadge() {
+  const prov = document.getElementById('ai-provider-select')?.value || 'ollama';
+  const badge = document.getElementById('provider-badge');
+  const name  = document.getElementById('provider-name');
+  if (name) name.textContent = prov;
+  if (badge) {
+    const colors = { openai:'#10a37f', anthropic:'#d97706', azure:'#0078d4', ollama:'var(--accent)', custom:'var(--purple)' };
+    badge.style.color = colors[prov] || 'var(--accent)';
+  }
+  UI.saveUIState();
+}
 
 function toggleTheme() {
   const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  const newTheme = isDark ? 'light' : 'dark';
-
+  const isDark = html.getAttribute('data-theme')==='dark';
+  const newTheme = isDark?'light':'dark';
   html.setAttribute('data-theme', newTheme);
   localStorage.setItem('theme', newTheme);
-
-  document.getElementById('theme-lbl').textContent = newTheme === 'dark' ? 'Dark' : 'Light';
+  document.getElementById('theme-lbl').textContent = newTheme==='dark'?'Dark':'Light';
+  // Redraw charts with new colors
+  const st = UI.getEnvState()[UI.getCurrentEnv()];
+  if (st.hasData) setTimeout(() => Charts.updateCharts(st.scores), 50);
 }
 
 function openModal(id) {
   document.getElementById(id).classList.add('open');
-  if (id === 'modal-users')  Auth.renderUserTable();
-  if (id === 'modal-tokens') Tokens.loadTokenFields();
+  if (id==='modal-users')  Auth.renderUserTable();
+  if (id==='modal-tokens') Tokens.loadTokenFields();
 }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function openTokensModal() { closeUserMenu(); openModal('modal-tokens'); }
-function openUsersModal()  { closeUserMenu(); openModal('modal-users');  }
-
-function toggleUserMenu(e) {
-  e.stopPropagation();
-  document.getElementById('user-dropdown').classList.toggle('open');
-}
+function openUsersModal()  { closeUserMenu(); openModal('modal-users'); }
+function toggleUserMenu(e) { e.stopPropagation(); document.getElementById('user-dropdown').classList.toggle('open'); }
 function closeUserMenu() { document.getElementById('user-dropdown')?.classList.remove('open'); }
 
 function handleLogout() {
-  closeUserMenu();
-  Auth.doLogout();
-  document.getElementById('results').innerHTML = '';
-  document.getElementById('log-area').innerHTML = '<div class="log-entry info"><span class="log-ts">--:--:--</span><span class="log-tag">INFO</span><span class="log-msg">Ready. Configure settings and press Run Audit.</span></div>';
+  closeUserMenu(); Auth.doLogout();
+  document.getElementById('results').innerHTML='';
+  document.getElementById('log-area').innerHTML='<div class="log-entry info"><span class="log-ts">--:--:--</span><span class="log-tag">INFO</span><span class="log-msg">Ready. Configure settings and press Run Audit.</span></div>';
+  Charts.resetCharts();
 }
-
 function handleAddUser() {
-  const name  = document.getElementById('new-user-name').value.trim();
-  const pass  = document.getElementById('new-user-pass').value;
-  const role  = document.getElementById('new-user-role').value;
-  const errEl = document.getElementById('add-user-error');
-  errEl.style.display = 'none';
-  const result = Auth.addUser(name, pass, role);
-  if (!result.ok) { errEl.textContent = result.msg; errEl.style.display = 'block'; return; }
-  document.getElementById('new-user-name').value = '';
-  document.getElementById('new-user-pass').value = '';
+  const name=document.getElementById('new-user-name').value.trim();
+  const pass=document.getElementById('new-user-pass').value;
+  const role=document.getElementById('new-user-role').value;
+  const errEl=document.getElementById('add-user-error'); errEl.style.display='none';
+  const result=Auth.addUser(name,pass,role);
+  if (!result.ok) { errEl.textContent=result.msg; errEl.style.display='block'; return; }
+  document.getElementById('new-user-name').value=''; document.getElementById('new-user-pass').value='';
   Auth.renderUserTable();
 }
 
-function initAuth() { Auth.initAuth(); }
+/* Close on backdrop click */
+document.addEventListener('click', e => { const o=e.target.closest('.modal-overlay'); if (o&&e.target===o) o.classList.remove('open'); });
+document.addEventListener('click', e => { const w=document.getElementById('user-menu-wrap'); if (w&&!w.contains(e.target)) closeUserMenu(); });
 
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-/* close modals on backdrop click */
-document.addEventListener('click', e => {
-  const overlay = e.target.closest('.modal-overlay');
-  if (overlay && e.target === overlay) overlay.classList.remove('open');
-});
-/* close user dropdown on outside click */
-document.addEventListener('click', e => {
-  const wrap = document.getElementById('user-menu-wrap');
-  if (wrap && !wrap.contains(e.target)) closeUserMenu();
-});
-
-/* expose updateUserUI so auth.js can call it after login */
 window.__updateUserUI = function() {
-  const u = Auth.getCurrentUser();
-  if (!u) return;
-  const av = document.getElementById('user-avatar'); if (av) av.textContent = u.username.slice(0,2).toUpperCase();
-  const nm = document.getElementById('ud-name');     if (nm) nm.textContent = u.username;
-  const rl = document.getElementById('ud-role');     if (rl) rl.textContent = u.role;
-  const mu = document.getElementById('ud-manage-users'); if (mu) mu.style.display = u.role === 'admin' ? 'flex' : 'none';
+  const u=Auth.getCurrentUser(); if (!u) return;
+  const av=document.getElementById('user-avatar'); if (av) av.textContent=u.username.slice(0,2).toUpperCase();
+  const nm=document.getElementById('ud-name'); if (nm) nm.textContent=u.username;
+  const rl=document.getElementById('ud-role'); if (rl) rl.textContent=u.role;
+  const mu=document.getElementById('ud-manage-users'); if (mu) mu.style.display=u.role==='admin'?'flex':'none';
 };
 
-// (saveUIState / loadUIState defined in ui.js)
-
-/* ── Boot ───────────────────────────────────────────────────────────── */
-document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-pass').focus(); });
-document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') Auth.doLogin(); });
+/* Boot */
+document.getElementById('login-user').addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('login-pass').focus(); });
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key==='Enter') Auth.doLogin(); });
+document.getElementById('login-btn').addEventListener('click', () => Auth.doLogin());
 
 UI.setEnv('production');
-
-// 🔥 FIX LOGIN CLICK
-document.getElementById('login-btn').addEventListener('click', () => {
-  console.log("✅ LOGIN BUTTON CLICKED");
-
-  const username = document.getElementById('login-user')?.value;
-  const password = document.getElementById('login-pass')?.value;
-
-  console.log("INPUT VALUES →", username, password);
-
-  if (window.Auth && typeof Auth.doLogin === 'function') {
-    console.log("✅ Calling Auth.doLogin()");
-    Auth.doLogin();
-  } else {
-    console.error("❌ Auth.doLogin NOT FOUND");
-  }
-}); 
-console.log("Auth object:", window.Auth);
-// ✅ LOAD saved values on page load
 loadUIState();
-document.getElementById('ai-provider-select')
-  .addEventListener('change', updateProviderBadge);
+document.getElementById('ai-provider-select').addEventListener('change', updateProviderBadge);
 
-updateProviderBadge();
+// Set theme label on load
+const _t = localStorage.getItem('theme')||'dark';
+const _tl = document.getElementById('theme-lbl'); if (_tl) _tl.textContent = _t==='dark'?'Dark':'Light';
 
-// ✅ SAVE whenever user changes anything
-['ns-select', 'ollama-url', 'model-select', 'ai-provider-select']
-  .forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('change', saveUIState);
-  });
-
-Auth.initAuth({ onSuccess: () => { window.__updateUserUI(); } });
-
-Audit.checkServer();
-Audit.loadNamespaces().then(() => {
-  loadUIState();  // restore AFTER namespace loads
-});
-Audit.loadProfiles();
-Audit.loadModels();
-setInterval(Audit.checkServer,    15000);
-setInterval(Audit.loadNamespaces, 30000);
-
-function updateProviderBadge() {
-  const provider = document.getElementById('ai-provider-select').value;
-  document.getElementById('provider-name').textContent = provider;
-}
-
-document.getElementById('ai-provider-select').addEventListener('change', (e) => {
-  // Reload models for the newly selected provider
-  Audit.loadModels();
+Auth.initAuth({
+  onSuccess: () => {
+    Audit.checkServer();
+    Audit.loadNamespaces();
+    Audit.loadProfiles();
+    setInterval(Audit.checkServer, 15000);
+  }
 });
 </script>
 </body>
