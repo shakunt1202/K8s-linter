@@ -1,0 +1,19 @@
+[2026-05-06T06:54:15.401Z] [INFO] Scheduled task: Full anatomy rescan (0 */6 * * *)
+[2026-05-06T06:54:15.406Z] [INFO] Scheduled task: Consolidate old memory (0 2 * * *)
+[2026-05-06T06:54:15.408Z] [INFO] Scheduled task: Token audit report (0 0 * * 1)
+[2026-05-06T06:54:15.410Z] [INFO] Scheduled task: Cerebrum reflection (0 3 * * 0)
+[2026-05-06T06:54:15.411Z] [INFO] Scheduled task: AI suggestions (0 4 * * 1)
+[2026-05-06T06:54:15.416Z] [INFO] File watcher started on .wolf/
+[2026-05-06T06:54:15.423Z] [INFO] OpenWolf daemon started
+[2026-05-06T06:54:15.425Z] [INFO] Dashboard server listening on port 18791
+[2026-05-06T06:54:22.386Z] [INFO] WebSocket client connected
+[2026-05-06T07:32:03.934Z] [INFO] WebSocket client connected
+[2026-05-06T08:46:52.297Z] [INFO] WebSocket client connected
+[2026-05-06T08:48:07.779Z] [INFO] WebSocket client connected
+[2026-05-06T08:57:28.236Z] [INFO] WebSocket client connected
+[2026-05-06T08:57:30.133Z] [INFO] WebSocket client connected
+[2026-05-06T09:05:09.105Z] [INFO] WebSocket client connected
+[2026-05-06T09:05:17.160Z] [INFO] WebSocket client connected
+[2026-05-06T09:05:25.885Z] [INFO] WebSocket client connected
+[2026-05-06T09:18:32.442Z] [INFO] WebSocket client connected
+[2026-05-06T09:49:52.619Z] [INFO] WebSocket client connected

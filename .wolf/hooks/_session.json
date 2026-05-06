@@ -1,0 +1,58 @@
+{
+  "session_id": "",
+  "files_read": {
+    "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html": {
+      "count": 18,
+      "tokens": 35739,
+      "first_read": "2026-05-06T07:27:36.905Z"
+    },
+    "D:/Tasks/Agentic/K8s-linter/server.py": {
+      "count": 2,
+      "tokens": 4178,
+      "first_read": "2026-05-06T08:57:59.965Z"
+    },
+    "D:/Tasks/Agentic/K8s-linter/sources/cluster_source.py": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-05-06T08:58:09.504Z"
+    },
+    "D:/Tasks/Agentic/K8s-linter/agent/linter_agent.py": {
+      "count": 5,
+      "tokens": 3108,
+      "first_read": "2026-05-06T08:58:09.662Z"
+    },
+    "D:/Tasks/Agentic/K8s-linter/main.py": {
+      "count": 1,
+      "tokens": 1894,
+      "first_read": "2026-05-06T08:58:16.245Z"
+    },
+    "D:/Tasks/Agentic/K8s-linter/models.py": {
+      "count": 1,
+      "tokens": 903,
+      "first_read": "2026-05-06T08:58:16.456Z"
+    },
+    "D:/Tasks/Agentic/K8s-linter/CLAUDE.md": {
+      "count": 1,
+      "tokens": 57,
+      "first_read": "2026-05-06T08:58:31.278Z"
+    },
+    "D:/Tasks/Agentic/K8s-linter/dockerfile": {
+      "count": 1,
+      "tokens": 168,
+      "first_read": "2026-05-06T08:59:13.341Z"
+    },
+    "D:/Tasks/Agentic/K8s-linter/requirements.txt": {
+      "count": 1,
+      "tokens": 123,
+      "first_read": "2026-05-06T08:59:20.473Z"
+    },
+    "D:/Tasks/Agentic/K8s-linter/sources/manifest_source.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-06T09:00:19.769Z"
+    }
+  },
+  "anatomy_hits": 7,
+  "anatomy_misses": 2,
+  "repeated_reads_warned": 23
+}

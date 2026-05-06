@@ -18,11 +18,13 @@ import importlib.util
 import io
 import json
 import logging
+import os
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -45,6 +47,9 @@ app.add_middleware(
 )
 
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+
+# ── Kubeconfig state ─────────────────────────────────────────────────
+_uploaded_kubeconfig_path: str | None = None
 
 PROFILE_MAP = {
     "cis":           "profiles/cis-benchmark.yaml",
@@ -178,18 +183,71 @@ def list_profiles():
 
 @app.get("/api/namespaces")
 def list_namespaces():
+    global _uploaded_kubeconfig_path
+    env = None
+    if _uploaded_kubeconfig_path and Path(_uploaded_kubeconfig_path).exists():
+        env = {**os.environ, "KUBECONFIG": _uploaded_kubeconfig_path}
     try:
         result = subprocess.run(
             ["kubectl", "get", "namespaces", "--output=json"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True, text=True, timeout=10, env=env,
         )
         if result.returncode == 0:
             data  = json.loads(result.stdout)
             names = [item["metadata"]["name"] for item in data.get("items", [])]
             return {"namespaces": names}
-    except (FileNotFoundError, subprocess.TimeoutExpired, json.JSONDecodeError):
-        pass
+        else:
+            logger.warning("kubectl namespaces failed: %s", result.stderr.strip())
+    except (FileNotFoundError, subprocess.TimeoutExpired, json.JSONDecodeError) as e:
+        logger.warning("kubectl namespaces error: %s", e)
     return {"namespaces": ["default"]}
+
+
+@app.post("/api/kubeconfig/upload")
+async def upload_kubeconfig(file: UploadFile = File(...)):
+    """Upload a kubeconfig file to use for cluster operations."""
+    global _uploaded_kubeconfig_path
+    content = await file.read()
+    if len(content) > 1_048_576:
+        raise HTTPException(status_code=413, detail="Kubeconfig file too large (max 1MB)")
+    if not content.strip():
+        raise HTTPException(status_code=400, detail="Empty file")
+    # Store in a temp file that persists for the server lifetime
+    kubeconfig_dir = Path(tempfile.gettempdir()) / "k8s_linter"
+    kubeconfig_dir.mkdir(exist_ok=True)
+    kubeconfig_path = kubeconfig_dir / "uploaded_kubeconfig"
+    kubeconfig_path.write_bytes(content)
+    _uploaded_kubeconfig_path = str(kubeconfig_path)
+    logger.info("Kubeconfig uploaded: %s (%d bytes)", _uploaded_kubeconfig_path, len(content))
+    # Validate by trying to get contexts
+    try:
+        result = subprocess.run(
+            ["kubectl", "config", "get-contexts", "--output=name"],
+            capture_output=True, text=True, timeout=5,
+            env={**os.environ, "KUBECONFIG": _uploaded_kubeconfig_path},
+        )
+        contexts = [c.strip() for c in result.stdout.strip().splitlines() if c.strip()]
+    except Exception:
+        contexts = []
+    return {"status": "ok", "path": _uploaded_kubeconfig_path, "contexts": contexts}
+
+
+@app.delete("/api/kubeconfig")
+def remove_kubeconfig():
+    """Remove the uploaded kubeconfig and revert to system default."""
+    global _uploaded_kubeconfig_path
+    if _uploaded_kubeconfig_path and Path(_uploaded_kubeconfig_path).exists():
+        Path(_uploaded_kubeconfig_path).unlink(missing_ok=True)
+    _uploaded_kubeconfig_path = None
+    return {"status": "ok"}
+
+
+@app.get("/api/kubeconfig/status")
+def kubeconfig_status():
+    """Check whether a kubeconfig is loaded."""
+    global _uploaded_kubeconfig_path
+    active = bool(_uploaded_kubeconfig_path and Path(_uploaded_kubeconfig_path).exists())
+    return {"active": active, "path": _uploaded_kubeconfig_path if active else None}
 
 
 @app.get("/api/ollama/models")
@@ -328,6 +386,7 @@ async def run_lint_stream(req: LintRequest, request: Request):
                         provider_base_url=req.provider_base_url,
                         provider_api_key=req.provider_api_key,
                         ai_remediation=req.ai_remediation,
+                        kubeconfig_path=_uploaded_kubeconfig_path or "",
                     )
                     results  = await agent.run()
                     reporter = Reporter(results)
@@ -400,6 +459,7 @@ async def run_lint(req: LintRequest):
         profile_path=profile_path, provider=req.provider, model=req.model,
         ollama_url=req.ollama_url, provider_base_url=req.provider_base_url,
         provider_api_key=req.provider_api_key, ai_remediation=req.ai_remediation,
+        kubeconfig_path=_uploaded_kubeconfig_path or "",
     )
     try:
         results = await agent.run()

@@ -6,6 +6,7 @@ Falls back gracefully when kubectl is not available (returns mock data for testi
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import logging
 from typing import Any, Dict, List
@@ -27,15 +28,22 @@ RESOURCE_KINDS = [
 
 
 class ClusterSource:
-    def __init__(self, namespace: str = "default"):
+    def __init__(self, namespace: str = "default", kubeconfig_path: str | None = None):
         self.namespace = namespace
+        self._kubeconfig_path = kubeconfig_path
+        self._env = self._build_env()
         self._kubectl_available = self._check_kubectl()
+
+    def _build_env(self) -> dict | None:
+        if self._kubeconfig_path:
+            return {**os.environ, "KUBECONFIG": self._kubeconfig_path}
+        return None
 
     def _check_kubectl(self) -> bool:
         try:
             result = subprocess.run(
                 ["kubectl", "version", "--client", "--output=json"],
-                capture_output=True, text=True, timeout=5
+                capture_output=True, text=True, timeout=5, env=self._env,
             )
             return result.returncode == 0
         except (FileNotFoundError, subprocess.TimeoutExpired):
@@ -44,9 +52,11 @@ class ClusterSource:
     def _run_kubectl(self, *args: str) -> Dict[str, Any] | None:
         cmd = ["kubectl", *args, "--output=json"]
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30, env=self._env)
             if result.returncode == 0:
                 return json.loads(result.stdout)
+            else:
+                logger.warning("kubectl %s failed: %s", args[0] if args else '', result.stderr.strip())
         except (subprocess.TimeoutExpired, json.JSONDecodeError) as e:
             logger.warning("kubectl error: %s", e)
         return None

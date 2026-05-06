@@ -68,12 +68,14 @@ class LinterAgent:
         provider_api_key:  str  = "",
         ollama_url:        str  = "http://localhost:11434",
         ai_remediation:    bool = True,
+        kubeconfig_path:   str  = "",
         **kwargs,
     ):
         self.source         = source
         self.namespace      = namespace
         self.manifest_path  = manifest_path
         self.profile_path   = profile_path
+        self.kubeconfig_path = kubeconfig_path or None
         self.ai_remediation = ai_remediation
         self.provider_name  = provider
         self.model          = model or self._default_model(provider)
@@ -162,7 +164,7 @@ class LinterAgent:
     def _fetch_resources(self):
         resources = []
         if self.source in ("cluster", "both"):
-            resources.extend(ClusterSource(self.namespace).fetch())
+            resources.extend(ClusterSource(self.namespace, kubeconfig_path=self.kubeconfig_path).fetch())
         if self.source in ("manifest", "both"):
             resources.extend(ManifestSource(self.manifest_path).fetch())
         return resources

@@ -69,7 +69,45 @@ select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
 @keyframes panelExpand{from{opacity:0;transform:scaleY(.96)}to{opacity:1;transform:none}}
 
 /* ── Layout ── */
-.app{display:grid;grid-template-columns:220px 1fr;grid-template-rows:52px 1fr;height:100vh;width:100vw;position:fixed;inset:0}
+.app{display:grid;grid-template-columns:220px 1fr;grid-template-rows:52px 1fr;height:100vh;width:100vw;position:fixed;inset:0;transition:grid-template-columns .3s cubic-bezier(.22,1,.36,1)}
+.app.sidebar-collapsed{grid-template-columns:0px 1fr}
+.app.sidebar-collapsed .sidebar{width:0;overflow:hidden;border-right:none;padding:0;opacity:0;pointer-events:none}
+.app.sidebar-collapsed .brand{width:0;padding:0;border-right:none;overflow:hidden;opacity:0}
+
+/* ── Sidebar toggle button ── */
+.sidebar-toggle{
+  position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:18px;height:44px;background:var(--surface);border:1px solid var(--divider);
+  border-left:none;border-radius:0 7px 7px 0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--t3);z-index:100;transition:all .2s;opacity:.6;
+}
+.sidebar-toggle:hover{background:var(--surface-2);color:var(--accent);opacity:1}
+.sidebar-toggle svg{width:12px;height:12px;transition:transform .3s}
+.app.sidebar-collapsed .sidebar-toggle svg{transform:rotate(180deg)}
+
+/* ── Fullscreen panel ── */
+.fullscreen-active .main{position:relative}
+.fs-panel{
+  display:none;position:absolute;inset:0;z-index:50;
+  background:var(--bg);flex-direction:column;overflow:hidden;
+  animation:panelExpand .25s cubic-bezier(.22,1,.36,1);
+}
+.fs-panel.open{display:flex}
+.fs-panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;height:40px;background:var(--surface);
+  border-bottom:1px solid var(--divider);flex-shrink:0;
+}
+.fs-panel-header-left{display:flex;align-items:center;gap:9px}
+.fs-panel-header-title{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:6px}
+.fs-panel-body{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--divider) transparent}
+.fs-exit-btn{
+  display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;
+  color:var(--t2);background:var(--surface-2);border:1px solid var(--glass-border);
+  border-radius:7px;padding:5px 11px;cursor:pointer;transition:all .2s;
+}
+.fs-exit-btn:hover{color:var(--red);border-color:var(--red);background:var(--red-soft)}
 
 /* ── Top bar ── */
 .topbar{
@@ -136,6 +174,7 @@ select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
   display:flex;flex-direction:column;overflow-y:auto;
   scrollbar-width:thin;scrollbar-color:var(--divider) transparent;
   animation:fadeIn .4s ease both;
+  transition:width .3s cubic-bezier(.22,1,.36,1), opacity .2s ease, padding .3s;
 }
 .sidebar-inner{padding:12px 10px;display:flex;flex-direction:column;gap:12px;flex:1}
 .sec-lbl{font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
@@ -353,12 +392,13 @@ select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
 .exp-panel{
   display:flex;flex-direction:column;
   border-bottom:1px solid var(--divider);
-  transition:flex .4s cubic-bezier(.22,1,.36,1);
+  transition:flex-grow .4s cubic-bezier(.22,1,.36,1), min-height .4s cubic-bezier(.22,1,.36,1);
   min-height:40px;
   overflow:hidden;
+  flex:0 0 40px;
 }
-.exp-panel.expanded{flex:1;min-height:200px}
-.exp-panel.collapsed{flex:0 0 40px}
+.exp-panel.expanded{flex:1 1 auto;min-height:200px}
+.exp-panel.collapsed{flex:0 0 40px;min-height:40px}
 
 .exp-panel-header{
   display:flex;align-items:center;justify-content:space-between;
@@ -674,8 +714,29 @@ select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
           <!-- Cluster panel -->
           <div class="src-panel active" id="src-panel-cluster">
             <div class="s-row">
+              <div class="s-lbl">Kubeconfig</div>
+              <div id="kubeconfig-area" style="display:flex;flex-direction:column;gap:7px">
+                <div id="kubeconfig-status" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface-2);border:1px solid var(--glass-border);border-radius:8px;font-size:11px;color:var(--t3)">
+                  <span id="kc-status-icon" style="font-size:13px">○</span>
+                  <span id="kc-status-text">No kubeconfig uploaded — using system default</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <label for="kubeconfig-file" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px dashed var(--accent-mid);border-radius:8px;padding:9px;cursor:pointer;transition:all .2s">
+                    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1v9M4 4l3-3 3 3" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 9v3a1 1 0 001 1h10a1 1 0 001-1V9" stroke-linecap="round"/></svg>
+                    Upload Kubeconfig
+                  </label>
+                  <input type="file" id="kubeconfig-file" accept=".yaml,.yml,.conf,.config,*" style="display:none" onchange="Kubeconfig.upload(this)">
+                  <button id="kc-remove-btn" onclick="Kubeconfig.remove()" style="display:none;font-size:11px;font-weight:500;color:var(--red);background:var(--red-soft);border:1px solid rgba(248,81,73,.2);border-radius:8px;padding:8px 11px;cursor:pointer;transition:all .2s;white-space:nowrap">Remove</button>
+                </div>
+                <div id="kc-contexts" style="display:none;font-family:'Geist Mono',monospace;font-size:10px;color:var(--t3);padding:5px 10px;background:var(--surface-3);border-radius:6px;line-height:1.7"></div>
+              </div>
+            </div>
+            <div class="s-row">
               <div class="s-lbl">Namespace</div>
-              <select id="ns-select" onchange="onSidebarChange(this,'Namespace updated')"><option value="default">default</option></select>
+              <div style="display:flex;gap:5px;align-items:center">
+                <select id="ns-select" onchange="onSidebarChange(this,'Namespace updated')" style="flex:1"><option value="default">default</option></select>
+                <button class="ref-btn" onclick="Kubeconfig.refreshNamespaces()" title="Refresh namespaces" style="font-size:13px;padding:6px 9px">&#8635;</button>
+              </div>
             </div>
           </div>
 
@@ -959,12 +1020,38 @@ select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
   </aside>
 
   <!-- MAIN -->
-  <main class="main">
+  <main class="main" style="position:relative">
+
+    <!-- Sidebar toggle -->
+    <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3L5 7l4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <!-- Fullscreen overlay panel -->
+    <div class="fs-panel" id="fs-panel">
+      <div class="fs-panel-header">
+        <div class="fs-panel-header-left">
+          <div class="fs-panel-header-title" id="fs-title">Panel</div>
+          <div id="fs-extra-controls"></div>
+        </div>
+        <button class="fs-exit-btn" onclick="closeFullscreen()">
+          <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h3M4 4v3M10 4h-3M10 4v3M4 10h3M4 10v-3M10 10h-3M10 10v-3"/></svg>
+          Exit Fullscreen
+        </button>
+      </div>
+      <div class="fs-panel-body" id="fs-body"></div>
+    </div>
 
     <!-- Log -->
     <div class="log-header">
       <span class="log-header-title">Live Audit Log</span>
-      <button class="log-clear-btn" onclick="document.getElementById('log-area').innerHTML=''">Clear</button>
+      <div style="display:flex;gap:5px;align-items:center">
+        <button class="log-clear-btn" onclick="document.getElementById('log-area').innerHTML=''">Clear</button>
+        <button class="exp-expand-btn" onclick="openFullscreen('logs')" title="Fullscreen">
+          <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2h4M2 2v4M12 2h-4M12 2v4M2 12h4M2 12v-4M12 12h-4M12 12v-4"/></svg>
+          Expand
+        </button>
+      </div>
     </div>
     <div class="log-area" id="log-area">
       <div class="log-entry info"><span class="log-ts">--:--:--</span><span class="log-tag">INFO</span><span class="log-msg">Ready. Configure settings and press Run Audit.</span></div>
@@ -998,11 +1085,11 @@ select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
             </div>
           </div>
           <div class="exp-panel-right" onclick="event.stopPropagation()">
-            <button class="exp-expand-btn" onclick="expandOnly('charts')">
+            <button class="exp-expand-btn" onclick="openFullscreen('charts')" title="Fullscreen">
               <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2h4M2 2v4M12 2h-4M12 2v4M2 12h4M2 12v-4M12 12h-4M12 12v-4"/></svg>
-              Expand
+              Fullscreen
             </button>
-            <svg class="exp-chevron" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5l4 4 4-4"/></svg>
+            <svg class="exp-chevron" onclick="togglePanel('charts')" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5l4 4 4-4"/></svg>
           </div>
         </div>
         <div class="exp-panel-body">
@@ -1114,11 +1201,11 @@ select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
               <div class="fchip" data-f="pass" onclick="UI.setFilter('pass')">Pass</div>
               <div class="fchip" data-f="warn" onclick="UI.setFilter('warn')">Warn</div>
             </div>
-            <button class="exp-expand-btn" onclick="expandOnly('findings')">
+            <button class="exp-expand-btn" onclick="openFullscreen('findings')" title="Fullscreen">
               <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2h4M2 2v4M12 2h-4M12 2v4M2 12h4M2 12v-4M12 12h-4M12 12v-4"/></svg>
-              Expand
+              Fullscreen
             </button>
-            <svg class="exp-chevron" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5l4 4 4-4"/></svg>
+            <svg class="exp-chevron" onclick="togglePanel('findings')" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5l4 4 4-4"/></svg>
           </div>
         </div>
         <div class="exp-panel-body">
@@ -1270,6 +1357,90 @@ function setProviderTab(p) {
 }
 function toggleTokenVisibility(id) { const el = document.getElementById(id); if (!el) return; el.type = el.type==='password'?'text':'password'; }
 window.Tokens = { loadTokenFields, saveTokens, getProviderCredentials, setProviderTab, toggleTokenVisibility };
+</script>
+<script>
+// ===== kubeconfig.js =====
+'use strict';
+(function(){
+  function _apiBase() { return (document.getElementById('api-base')?.value||'http://localhost:8000').replace(/\/$/,''); }
+  function _setStatus(icon, text, active) {
+    const iconEl=document.getElementById('kc-status-icon'), textEl=document.getElementById('kc-status-text');
+    const removeBtn=document.getElementById('kc-remove-btn');
+    if (iconEl) iconEl.textContent=icon;
+    if (textEl) textEl.textContent=text;
+    if (removeBtn) removeBtn.style.display=active?'block':'none';
+    const statusEl=document.getElementById('kubeconfig-status');
+    if (statusEl) statusEl.style.borderColor=active?'var(--green)':'var(--glass-border)';
+  }
+  function _showContexts(contexts) {
+    const el=document.getElementById('kc-contexts');
+    if (!el) return;
+    if (contexts&&contexts.length) { el.style.display='block'; el.textContent='Contexts: '+contexts.join(', '); }
+    else { el.style.display='none'; el.textContent=''; }
+  }
+  async function upload(input) {
+    if (!input.files||!input.files[0]) return;
+    const file=input.files[0];
+    if (file.size>1048576) { window.showToast?.('File too large','Max 1MB','error','kc-err'); input.value=''; return; }
+    _setStatus('⟳','Uploading…',false);
+    const formData=new FormData();
+    formData.append('file', file);
+    try {
+      const r=await fetch(_apiBase()+'/api/kubeconfig/upload',{method:'POST',body:formData});
+      if (!r.ok) { const e=await r.json().catch(()=>({detail:r.statusText})); throw new Error(e.detail||r.statusText); }
+      const data=await r.json();
+      _setStatus('●','Kubeconfig active',true);
+      _showContexts(data.contexts||[]);
+      window.showToast?.('Kubeconfig uploaded','Cluster connection ready','saved','kc-ok');
+      window.__addLog?.('info','Kubeconfig uploaded — refreshing namespaces…');
+      await refreshNamespaces();
+    } catch(e) {
+      _setStatus('✕','Upload failed: '+e.message,false);
+      window.showToast?.('Upload failed',e.message,'error','kc-err');
+    }
+    input.value='';
+  }
+  async function remove() {
+    try {
+      await fetch(_apiBase()+'/api/kubeconfig',{method:'DELETE'});
+      _setStatus('○','No kubeconfig uploaded — using system default',false);
+      _showContexts(null);
+      window.showToast?.('Kubeconfig removed','Using system default','info','kc-rm');
+      window.__addLog?.('info','Kubeconfig removed — reverting to system default');
+      await refreshNamespaces();
+    } catch(e) { window.showToast?.('Error',e.message,'error','kc-err'); }
+  }
+  async function refreshNamespaces() {
+    const sel=document.getElementById('ns-select'); if (!sel) return;
+    const btn=sel.parentElement?.querySelector('.ref-btn'); if(btn) btn.style.opacity='0.5';
+    try {
+      const r=await fetch(_apiBase()+'/api/namespaces');
+      if (!r.ok) throw new Error(r.statusText);
+      const d=await r.json();
+      const prev=sel.value;
+      sel.innerHTML=d.namespaces.map(n=>`<option value="${n}">${n}</option>`).join('');
+      if ([...sel.options].some(o=>o.value===prev)) sel.value=prev;
+      window.__addLog?.('info',`Loaded ${d.namespaces.length} namespace(s): ${d.namespaces.slice(0,5).join(', ')}${d.namespaces.length>5?' …':''}`);
+      if (d.namespaces.length>1||d.namespaces[0]!=='default') {
+        window.showToast?.('Namespaces loaded',d.namespaces.length+' namespace(s)','saved','ns-load');
+      }
+    } catch(e) {
+      sel.innerHTML='<option value="default">default</option>';
+      window.__addLog?.('warn','Failed to fetch namespaces: '+e.message);
+    }
+    if(btn) btn.style.opacity='';
+  }
+  async function checkStatus() {
+    try {
+      const r=await fetch(_apiBase()+'/api/kubeconfig/status');
+      if (!r.ok) return;
+      const d=await r.json();
+      if (d.active) { _setStatus('●','Kubeconfig active',true); }
+      else { _setStatus('○','No kubeconfig uploaded — using system default',false); }
+    } catch {}
+  }
+  window.Kubeconfig = { upload, remove, refreshNamespaces, checkStatus };
+})();
 </script>
 <script>
 // ===== ui.js =====
@@ -1603,7 +1774,10 @@ async function loadNamespaces() {
   try {
     const r=await fetch(getApiBase()+'/api/namespaces'); if (!r.ok) return;
     const d=await r.json(); const sel=document.getElementById('ns-select');
-    if (sel) sel.innerHTML=d.namespaces.map(n=>`<option value="${n}">${n}</option>`).join('');
+    if (sel) {
+      sel.innerHTML=d.namespaces.map(n=>`<option value="${n}">${n}</option>`).join('');
+      const raw=localStorage.getItem('k8s-linter-ui'); if (raw) { const st=JSON.parse(raw); if (st.namespace&&[...sel.options].some(o=>o.value===st.namespace)) sel.value=st.namespace; }
+    }
   } catch { const sel=document.getElementById('ns-select'); if (sel&&!sel.options.length) sel.innerHTML='<option value="default">default</option>'; }
 }
 async function loadProfiles() {
@@ -1723,7 +1897,7 @@ async function runLint() {
           showToast(`Audit complete · ${data.grade}`,`Score ${Math.round(data.score||0)}% · ${(data.findings||[]).length} findings`,'saved','audit-done',3000);
           // Auto-open findings panel after audit
           if (document.getElementById('panel-findings').classList.contains('collapsed')) {
-            setTimeout(() => expandOnly('findings'), 600);
+            setTimeout(() => togglePanel('findings'), 600);
           }
         } else if (evType==='error') { clearInterval(ticker); addLog('fail','Error: '+text); setProgress(0,'Error'); }
       }
@@ -1764,10 +1938,91 @@ function expandOnly(name) {
       el.classList.toggle('collapsed', p !== name);
     }
   });
-  // Show sub-tabs only when findings is expanded
   const subTabs = document.getElementById('findings-sub-tabs');
   if (subTabs) subTabs.style.display = (name === 'findings') ? 'flex' : 'none';
 }
+
+/* ── Sidebar collapse ── */
+function toggleSidebar() {
+  const app = document.getElementById('main-app');
+  app.classList.toggle('sidebar-collapsed');
+  localStorage.setItem('k8s_sidebar_collapsed', app.classList.contains('sidebar-collapsed')?'1':'');
+}
+(function(){
+  if (localStorage.getItem('k8s_sidebar_collapsed')==='1') {
+    document.getElementById('main-app')?.classList.add('sidebar-collapsed');
+  }
+})();
+
+/* ── Fullscreen panels ── */
+let _fsActive = null;
+let _fsOrigParent = null;
+let _fsOrigNextSibling = null;
+let _fsMovedEl = null;
+
+function openFullscreen(panel) {
+  const fsEl = document.getElementById('fs-panel');
+  const fsBody = document.getElementById('fs-body');
+  const fsTitle = document.getElementById('fs-title');
+  const fsExtra = document.getElementById('fs-extra-controls');
+  if (!fsEl||!fsBody||!fsTitle) return;
+
+  // Close previous if open
+  if (_fsActive) _restoreMovedEl();
+  _fsActive = panel;
+  fsBody.innerHTML = '';
+  fsExtra.innerHTML = '';
+
+  if (panel === 'logs') {
+    fsTitle.textContent = 'Live Audit Log';
+    const logArea = document.getElementById('log-area');
+    _saveAndMove(logArea, fsBody);
+    logArea.style.height = '100%';
+    logArea.style.flex = '1';
+    fsExtra.innerHTML = '<button class="log-clear-btn" onclick="document.getElementById(\'log-area\').innerHTML=\'\'">Clear</button>';
+  } else if (panel === 'charts') {
+    fsTitle.textContent = 'Charts & Analytics';
+    const chartsBody = document.querySelector('#panel-charts .exp-panel-body');
+    if (chartsBody) { _saveAndMove(chartsBody, fsBody); chartsBody.style.display='block'; }
+  } else if (panel === 'findings') {
+    fsTitle.textContent = 'Findings';
+    const findingsBody = document.querySelector('#panel-findings .exp-panel-body');
+    if (findingsBody) { _saveAndMove(findingsBody, fsBody); findingsBody.style.display='block'; }
+    fsExtra.innerHTML = `<div class="filters" style="display:flex;gap:4px;align-items:center;margin-left:12px">
+      <div class="fchip active" data-f="all" onclick="UI.setFilter('all')">All</div>
+      <div class="fchip" data-f="fail" onclick="UI.setFilter('fail')">Fail</div>
+      <div class="fchip" data-f="pass" onclick="UI.setFilter('pass')">Pass</div>
+      <div class="fchip" data-f="warn" onclick="UI.setFilter('warn')">Warn</div>
+    </div>`;
+  }
+  fsEl.classList.add('open');
+}
+
+function _saveAndMove(el, target) {
+  _fsOrigParent = el.parentNode;
+  _fsOrigNextSibling = el.nextSibling;
+  _fsMovedEl = el;
+  target.appendChild(el);
+}
+
+function _restoreMovedEl() {
+  if (_fsMovedEl && _fsOrigParent) {
+    // Restore original styles
+    if (_fsMovedEl.id === 'log-area') { _fsMovedEl.style.height = ''; _fsMovedEl.style.flex = ''; }
+    if (_fsMovedEl.classList.contains('exp-panel-body')) { _fsMovedEl.style.display = ''; }
+    if (_fsOrigNextSibling) _fsOrigParent.insertBefore(_fsMovedEl, _fsOrigNextSibling);
+    else _fsOrigParent.appendChild(_fsMovedEl);
+  }
+  _fsMovedEl = null; _fsOrigParent = null; _fsOrigNextSibling = null;
+}
+
+function closeFullscreen() {
+  _restoreMovedEl();
+  const fsEl = document.getElementById('fs-panel');
+  if (fsEl) fsEl.classList.remove('open');
+  _fsActive = null;
+}
+document.addEventListener('keydown', e => { if (e.key==='Escape' && _fsActive) closeFullscreen(); });
 
 /* ── Settings panel ── */
 function openSettings() {
@@ -1949,7 +2204,8 @@ const _tl = document.getElementById('theme-lbl'); if (_tl) _tl.textContent = _t=
 Auth.initAuth({
   onSuccess: () => {
     Audit.checkServer();
-    Audit.loadNamespaces();
+    Kubeconfig.checkStatus();
+    Kubeconfig.refreshNamespaces();
     Audit.loadProfiles();
     setInterval(Audit.checkServer, 15000);
   }

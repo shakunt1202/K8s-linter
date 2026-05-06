@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-05-06T08:53:21.230Z",
+      "error_message": "Significant refactor of ",
+      "file": "k8s_linter_ui.html",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 9→10 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T08:53:21.230Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-05-06T09:03:28.439Z",
+      "error_message": "Missing await",
+      "file": "server.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T09:03:28.439Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-05-06T09:04:12.153Z",
+      "error_message": "Significant refactor of ",
+      "file": "sources/cluster_source.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 52→62 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T09:04:12.153Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-05-06T09:11:38.487Z",
+      "error_message": "Missing error handling in _apiBase",
+      "file": "k8s_linter_ui.html",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T09:11:38.487Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-05-06T09:45:24.062Z",
+      "error_message": "Null/undefined access in ",
+      "file": "k8s_linter_ui.html",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T09:45:24.062Z"
+    }
+  ]
+}
