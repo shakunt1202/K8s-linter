@@ -80,6 +80,102 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-06T09:45:24.062Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-05-06T10:52:31.661Z",
+      "error_message": "Significant refactor of ",
+      "file": "k8s_linter_ui.html",
+      "root_cause": "13 lines replaced/restructured",
+      "fix": "Rewrote 28→40 lines (13 removed) | Also: .app{display:grid;grid-template-columns:220px 1fr;; .app.sidebar-collapsed .sidebar{width:0;overflow:h | Also: height:52px;z-index:200;animation:slideDown .45s c; .brand{display:flex;align-items:center;gap:10px;pa | Also: .charts-grid{display:grid;grid-template-columns:re; .chart-card{background:var(--surface);border:1px s | Also: .main{display:flex;flex-direction:column;overflow:; .log-header{display:flex;align-items:center;justif | Also: .prog-wrap{display:flex;align-items:center;gap:10p; .prog-lbl{font-size:11px;color:var(--t3);white-spa | Also: .run-btn{font-size:13px;font-weight:600;color:whit; .run-btn:hover{filter:brightness(1.1)}",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 7,
+      "last_seen": "2026-05-06T10:54:52.492Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-05-06T11:18:41.099Z",
+      "error_message": "Null/undefined access in ",
+      "file": "k8s_linter_ui.html",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T11:18:41.099Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-05-06T11:19:40.406Z",
+      "error_message": "Significant refactor of ",
+      "file": "k8s_linter_ui.html",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 3→18 lines (2 removed) | Also: .env-pill{font-size:11px;font-weight:500;padding:5; .env-pill:hover{background:var(--surface-3)} | Also: .sev-grid{display:grid;grid-template-columns:1fr 1; .sev-card{background:var(--surface-2);border-radiu",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-05-06T11:20:19.818Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-05-06T11:49:07.964Z",
+      "error_message": "Significant refactor of ",
+      "file": "k8s_linter_ui.html",
+      "root_cause": "27 lines replaced/restructured",
+      "fix": "Rewrote 40→27 lines (27 removed) | Also: height:52px;z-index:200;animation:slideDown .5s cu; position:relative; | Also: animation:fadeIn .4s ease both;; transition:width .3s cubic-bezier(.22,1,.36,1), op | Also: font-size:13px;font-weight:600;color:white;backgro; border:none;border-radius:9px;padding:8px 20px;cur | Also: .charts-grid{display:grid;grid-template-columns:re; background:var(--surface);border:1px solid var(--g | Also: .sev-grid{display:grid;grid-template-columns:1fr 1; .sev-card{background:var(--surface-2);border-radiu | Also: .main{display:flex;flex-direction:column;overflow:; .log-header{display:flex;align-items:center;justif | Also: .prog-wrap{display:flex;align-items:center;gap:10p; .prog-lbl{font-size:11px;color:var(--t3);white-spa | Also: #login-screen{; position:fixed;inset:0;z-index:1000;display:flex;a | Also: transition:flex .4s cubic-bezier(.22,1,.36,1), opa; min-height:0; | Also: --glass-bg:rgba(255,255,255,0.72);; --glass-blur:blur(20px) saturate(1.6); | Also: --glass-bg:rgba(18,21,28,0.85);; --glass-blur:blur(20px) saturate(1.4);",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 12,
+      "last_seen": "2026-05-06T11:52:48.382Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-05-06T12:10:14.419Z",
+      "error_message": "Wrong reference: all should be background",
+      "file": "k8s_linter_ui.html",
+      "root_cause": "Used \"all\" instead of \"background\"",
+      "fix": "Changed all → background",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 9,
+      "last_seen": "2026-05-06T12:11:29.473Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-05-06T12:11:50.002Z",
+      "error_message": "Incorrect value in code",
+      "file": "k8s_linter_ui.html",
+      "root_cause": "Had \"flex:1;display:flex;align-items:center;justify-co",
+      "fix": "Changed to \"flex:1;display:flex;align-items:center;justify-co",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-05-06T12:11:55.706Z"
     }
   ]
 }

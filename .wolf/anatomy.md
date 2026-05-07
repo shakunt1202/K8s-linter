@@ -1,13 +1,13 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-06T09:49:15.225Z
-> Files: 519 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-06T12:30:00.782Z
+> Files: 515 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
 - `CLAUDE.md` — OpenWolf (~57 tok)
 - `dockerfile` — -------- Base Image -------- (~168 tok)
-- `k8s_linter_ui.html` — K8s Environment Linter (~35960 tok)
+- `k8s_linter_ui.html` — K8s Environment Linter (~36727 tok)
 - `main.py` — parse_args, main (~1894 tok)
 - `models.py` — Severity: compute_score (~903 tok)
 - `README.md` — Project documentation (~1317 tok)
@@ -15,7 +15,7 @@
 - `report.md` — K8s Environment Lint Report (~5368 tok)
 - `requirements-minimal.txt` — Minimal install — Ollama only (no openai/anthropic packages needed) (~36 tok)
 - `requirements.txt` — Python dependencies (~123 tok)
-- `server.py` — API: 13 endpoints (~4956 tok)
+- `server.py` — API: GET, POST, DELETE, PUT (13 endpoints) (~4956 tok)
 - `users.json` (~92 tok)
 
 ## .claude/
@@ -651,6 +651,13 @@
 - `jiter.cp311-win_amd64.pyd` (~120028 tok)
 - `py.typed` (~0 tok)
 
+## k8s-linter/Lib/site-packages/multipart/
+
+- `__init__.py` — you may not use this file except in compliance with the License. (~422 tok)
+- `decoders.py` (~12 tok)
+- `exceptions.py` (~12 tok)
+- `multipart.py` (~12 tok)
+
 ## k8s-linter/Lib/site-packages/openai/
 
 - `__init__.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~3293 tok)
@@ -790,19 +797,8 @@
 - `__init__.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~1835 tok)
 - `batches.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~6209 tok)
 - `completions.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~17198 tok)
-- `embeddings.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~3614 tok)
-- `files.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~8890 tok)
-- `images.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~27842 tok)
-- `models.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~3290 tok)
 
 ## k8s-linter/Lib/site-packages/openai/resources/audio/
 
 - `__init__.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~482 tok)
 - `audio.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~1852 tok)
-- `speech.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~3020 tok)
-- `transcriptions.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~15181 tok)
-- `translations.py` — File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details. (~4460 tok)
-
-## sources/
-
-- `cluster_source.py` — ClusterSource: fetch (~2096 tok)

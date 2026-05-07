@@ -2,16 +2,160 @@
   "version": 1,
   "created_at": "2026-05-06T06:53:59.119Z",
   "lifetime": {
-    "total_tokens_estimated": 0,
-    "total_reads": 0,
-    "total_writes": 0,
-    "total_sessions": 0,
-    "anatomy_hits": 0,
+    "total_tokens_estimated": 38328,
+    "total_reads": 1,
+    "total_writes": 24,
+    "total_sessions": 1,
+    "anatomy_hits": 1,
     "anatomy_misses": 0,
-    "repeated_reads_blocked": 0,
-    "estimated_savings_vs_bare_cli": 0
+    "repeated_reads_blocked": 7,
+    "estimated_savings_vs_bare_cli": 257289
   },
-  "sessions": [],
+  "sessions": [
+    {
+      "id": "session-2026-05-06-1738",
+      "started": "2026-05-06T12:08:56.077Z",
+      "ended": "2026-05-06T12:12:33.641Z",
+      "reads": [
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 36727,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 80,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 78,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 26,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 63,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 77,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 62,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 95,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 48,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 63,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 69,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 48,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 48,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 69,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 61,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 67,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 76,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 61,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 78,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 56,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 58,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 54,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 84,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 85,
+          "action": "edit"
+        },
+        {
+          "file": "D:/Tasks/Agentic/K8s-linter/k8s_linter_ui.html",
+          "tokens_estimated": 95,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 36727,
+        "output_tokens_estimated": 1601,
+        "reads_count": 1,
+        "writes_count": 24,
+        "repeated_reads_blocked": 7,
+        "anatomy_lookups": 1
+      }
+    }
+  ],
   "daemon_usage": [],
   "waste_flags": [],
   "optimization_report": {

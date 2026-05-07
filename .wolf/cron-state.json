@@ -1,7 +1,14 @@
 {
-  "last_heartbeat": "2026-05-06T10:24:15.475Z",
+  "last_heartbeat": "2026-05-07T04:28:48.123Z",
   "engine_status": "running",
-  "execution_log": [],
+  "execution_log": [
+    {
+      "task_id": "anatomy-rescan",
+      "status": "success",
+      "timestamp": "2026-05-06T12:30:00.787Z",
+      "duration_ms": 778
+    }
+  ],
   "dead_letter_queue": [],
   "upcoming": []
 }
